@@ -1,0 +1,1211 @@
+<title>Nexo Digital Gestão</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: barra lateral escura fixa (navegação do sistema) + área de trabalho clara; no celular a navegação vira faixa de abas no topo */
+:root {
+  --bg: #f2f5f7; --surface: #ffffff; --ink: #142838; --muted: #637382; --line: #dfe6eb; --soft: #ebf1f4;
+  --accent: #00897b; --accent-soft: #dff3f0; --teal-a: #00b3a1; --teal-b: #00857a;
+  --s-todo: #c3e9e3; --s-doing: #35b8a8; --s-done: #0b6a61;
+  --side: #1a3a51; --side-ink: #eef4f7; --side-muted: #93abbb;
+  --ok: #1d8a5b; --ok-soft: #e3f3eb; --warn: #b8730c; --warn-soft: #fbf0dc; --bad: #c43d2c; --bad-soft: #fbe6e3;
+  --display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
+  --body: "Manrope", "Helvetica Neue", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0b1620; --surface: #12212d; --ink: #e8f0f4; --muted: #8fa3b2; --line: #1f3443; --soft: #172a38;
+  --accent: #2fd1bd; --accent-soft: #0f302d;
+  --side: #1a3a51; --side-ink: #eef4f7; --side-muted: #93abbb;
+  --ok: #5cc794; --ok-soft: #13291f; --warn: #e5ad52; --warn-soft: #2d2412; --bad: #f08573; --bad-soft: #321a16;
+  --s-todo: #1f4a46; --s-doing: #2a9d8f; --s-done: #6fe3d3;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0b1620; --surface: #12212d; --ink: #e8f0f4; --muted: #8fa3b2; --line: #1f3443; --soft: #172a38;
+  --accent: #2fd1bd; --accent-soft: #0f302d;
+  --side: #1a3a51; --side-ink: #eef4f7; --side-muted: #93abbb;
+  --ok: #5cc794; --ok-soft: #13291f; --warn: #e5ad52; --warn-soft: #2d2412; --bad: #f08573; --bad-soft: #321a16;
+  --s-todo: #1f4a46; --s-doing: #2a9d8f; --s-done: #6fe3d3;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 14px; line-height: 1.45; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.app { display: grid; grid-template-columns: 228px 1fr; min-height: 100%; }
+aside.side { background: var(--side); color: var(--side-ink); padding-block: 24px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: 16px; display: flex; flex-direction: column; gap: 22px; position: sticky; top: 0; height: 100vh; }
+.brand img { display: block; width: 150px; height: auto; margin-left: -8px; }
+.brand small { display: block; font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; color: var(--side-muted); margin-top: 2px; }
+.brand::after { content: ""; display: block; height: 2px; width: 44px; margin-top: 12px; border-radius: 2px; background: linear-gradient(90deg, var(--teal-a), var(--teal-b)); }
+nav.menu { display: grid; gap: 2px; }
+.menu .group { font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--side-muted); margin: 14px 10px 6px; }
+.menu button { display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; background: transparent; border: 0; color: var(--side-ink); padding: 8px 10px; border-radius: 8px; font-weight: 500; opacity: 0.78; }
+.menu button:hover { opacity: 1; background: rgba(255,255,255,0.05); }
+.menu button[aria-current="page"] { opacity: 1; background: rgba(255,255,255,0.09); box-shadow: inset 3px 0 0 var(--teal-a); }
+.menu .badge { font-family: var(--mono); font-size: 11px; color: var(--side-muted); }
+.menu .lock { font-size: 11px; color: var(--side-muted); }
+.side .foot { margin-top: auto; font-size: 12px; color: var(--side-muted); }
+
+main { min-width: 0; padding-block: 28px 64px; padding-left: max(16px, 3vw); padding-right: max(16px, env(safe-area-inset-right, 0px), 3vw); display: grid; gap: 22px; align-content: start; }
+.crumb { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 20px; }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 4.6vw, 52px); line-height: 1; margin: 6px 0 0; letter-spacing: -0.015em; text-wrap: balance; }
+h1 em { font-style: italic; color: var(--accent); }
+.lede { color: var(--muted); margin: 8px 0 0; max-width: 62ch; }
+h2 { font-size: 15px; font-weight: 700; margin: 0; }
+.status { font-size: 13px; color: var(--muted); }
+.status.err { color: var(--bad); }
+
+.btn { border: 1px solid var(--line); background: var(--surface); padding: 8px 14px; border-radius: 99px; font-weight: 600; font-size: 13px; }
+.btn:hover { border-color: var(--ink); }
+.btn.primary { background: linear-gradient(135deg, var(--teal-a), var(--teal-b)); color: #ffffff; border-color: transparent; }
+.btn.primary:hover { border-color: transparent; filter: brightness(1.06); }
+.btn.ghost { background: transparent; }
+.btn.danger { color: var(--bad); border-color: var(--bad); background: transparent; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toolbar .sp { flex: 1; }
+.chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 5px 11px; font-size: 13px; font-weight: 500; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.dot { width: 8px; height: 8px; border-radius: 50%; flex: none; background: var(--c, var(--muted)); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 99px; padding: 2px; background: var(--surface); }
+.seg button { border: 0; background: transparent; padding: 5px 12px; border-radius: 99px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--soft); color: var(--ink); }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 18px; min-width: 0; display: grid; gap: 12px; align-content: start; }
+.panel.dark { background: var(--side); color: var(--side-ink); border-color: var(--side); box-shadow: inset 0 3px 0 var(--teal-a); }
+.panel.dark .btn { background: transparent; color: var(--side-ink); border-color: rgba(255,255,255,0.25); }
+.panel.dark .k, .panel.dark .muted { color: var(--side-muted); }
+.panel .ph { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.k { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); }
+.grid { display: grid; gap: 14px; grid-template-columns: repeat(12, 1fr); }
+.c4 { grid-column: span 4; } .c5 { grid-column: span 5; } .c6 { grid-column: span 6; } .c7 { grid-column: span 7; } .c8 { grid-column: span 8; } .c12 { grid-column: span 12; }
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 10px; }
+.flow .n { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.flow .l { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+.big { font-family: var(--display); font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+
+.list { display: grid; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.row { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 9px 8px; border-radius: 10px; border: 0; background: transparent; text-align: left; width: 100%; }
+button.row:hover { background: var(--soft); }
+.row .t { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
+.row .s { font-size: 12px; color: var(--muted); font-weight: 400; }
+.empty { color: var(--muted); font-size: 13px; padding: 8px; }
+.pill { font-family: var(--mono); font-size: 10.5px; padding: 2px 8px; border-radius: 99px; background: var(--soft); color: var(--muted); white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.pill.acc { background: var(--accent-soft); color: var(--accent); }
+
+.kanban-wrap { overflow-x: auto; padding-bottom: 8px; }
+.kanban { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(232px, 1fr); gap: 12px; min-width: min-content; }
+.col { background: var(--soft); border-radius: 14px; padding: 10px; display: grid; gap: 8px; align-content: start; min-height: 160px; }
+.col.over { outline: 2px dashed var(--accent); }
+.col .ch { display: flex; justify-content: space-between; align-items: center; padding: 2px 4px 4px; font-weight: 700; font-size: 13px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: grid; gap: 6px; text-align: left; width: 100%; }
+.card:hover { border-color: var(--muted); }
+.card .ct { font-weight: 600; overflow-wrap: anywhere; }
+.card .cm { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); }
+.card .cl { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+
+.cal-wrap { overflow-x: auto; }
+.cal { display: grid; grid-template-columns: repeat(7, minmax(104px, 1fr)); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--line); gap: 1px; min-width: 740px; }
+.cal .dh { background: var(--surface); padding: 8px 10px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.cal .day { background: var(--surface); min-height: 112px; padding: 6px; display: grid; gap: 4px; align-content: start; }
+.cal .day.out { background: var(--soft); }
+.cal .day .dn { display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cal .day.today .dn b { background: var(--accent); color: var(--surface); border-radius: 99px; padding: 0 7px; }
+.cal .day .add { border: 0; background: transparent; color: var(--muted); opacity: 0; font-size: 15px; line-height: 1; padding: 0 4px; }
+.cal .day:hover .add, .cal .day .add:focus-visible { opacity: 1; }
+.cal .ev { display: grid; gap: 1px; border: 0; text-align: left; border-left: 3px solid var(--c); background: var(--soft); border-radius: 6px; padding: 4px 6px; font-size: 12px; width: 100%; }
+.cal .ev .et { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal .ev .es { font-size: 10.5px; color: var(--muted); }
+
+.clients { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); }
+.client { text-align: left; border-top: 4px solid var(--c); }
+a.btn { text-decoration: none; color: inherit; display: inline-flex; align-items: center; }
+a.btn.primary { color: #ffffff; }
+.client .name { font-family: var(--display); font-size: 26px; line-height: 1.05; }
+.client dl { display: grid; grid-template-columns: 92px 1fr; gap: 6px 10px; margin: 0; font-size: 13px; }
+.client dt { color: var(--muted); }
+.client dd { margin: 0; min-width: 0; overflow-wrap: anywhere; white-space: pre-line; }
+
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 640px; }
+th { text-align: left; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 500; padding: 8px; border-bottom: 1px solid var(--line); }
+td { padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.click { cursor: pointer; } tr.click:hover td { background: var(--soft); }
+.in { color: var(--ok); } .out { color: var(--bad); }
+
+dialog.drawer { border: 0; padding: 0; margin: 0 0 0 auto; height: 100%; max-height: 100%; width: min(480px, 100%); background: var(--surface); color: var(--ink); box-shadow: -20px 0 60px rgba(0,0,0,0.18); }
+dialog.drawer::backdrop { background: rgba(10,12,16,0.35); }
+.drawer form { display: grid; gap: 14px; padding-block: max(22px, env(safe-area-inset-top, 0px)) 22px; padding-left: 22px; padding-right: max(22px, env(safe-area-inset-right, 0px)); }
+.drawer .dhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.drawer h3 { font-family: var(--display); font-weight: 400; font-size: 30px; margin: 0; }
+.field { display: grid; gap: 5px; }
+.field label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.field input, .field select, .field textarea { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 9px 11px; }
+.field textarea { min-height: 96px; resize: vertical; }
+.field.check { grid-template-columns: auto 1fr; align-items: center; }
+.field.check input { width: auto; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.dfoot { display: flex; gap: 8px; justify-content: space-between; flex-wrap: wrap; padding-top: 6px; }
+
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+.kpi { background: var(--soft); border-radius: 12px; padding: 12px; display: grid; gap: 2px; }
+.kpi .n { font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.15; }
+.kpi .d { font-size: 12px; color: var(--muted); }
+.kpi .d.up { color: var(--ok); } .kpi .d.down { color: var(--bad); }
+.prose { white-space: pre-line; max-width: 70ch; overflow-wrap: anywhere; }
+.swatches { display: flex; flex-wrap: wrap; gap: 10px; }
+.sw { display: grid; gap: 4px; border: 0; background: transparent; padding: 0; text-align: left; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.sw i { display: block; width: 64px; height: 44px; border-radius: 10px; border: 1px solid var(--line); background: var(--c); }
+.imgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.imgs figure { margin: 0; position: relative; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--soft); aspect-ratio: 1; max-width: 100%; }
+.imgs img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.imgs a.file { display: grid; place-items: center; height: 100%; padding: 10px; text-align: center; font-size: 12px; color: var(--ink); overflow-wrap: anywhere; }
+.imgs .rm { position: absolute; top: 6px; right: 6px; border: 0; border-radius: 99px; padding: 2px 8px; font-size: 11px; background: var(--surface); color: var(--bad); opacity: 0; }
+.imgs figure:hover .rm, .imgs .rm:focus-visible, .imgs .rm.sure { opacity: 1; }
+label.btn { display: inline-flex; align-items: center; position: relative; }
+label.btn input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.links a { color: var(--accent); overflow-wrap: anywhere; }
+.prog { height: 6px; border-radius: 99px; background: var(--soft); overflow: hidden; }
+.prog i { display: block; height: 100%; width: var(--p, 0%); background: linear-gradient(90deg, var(--teal-a), var(--teal-b)); border-radius: 99px; }
+.pillars { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+.pillar { display: grid; gap: 8px; align-content: start; }
+.pillar .pn { font-family: var(--display); font-size: 40px; line-height: 0.9; color: var(--accent); }
+.pillar h3 { margin: 0; font-size: 15px; }
+.pillar p { margin: 0; font-size: 13px; color: var(--muted); }
+.phase { display: grid; gap: 10px; }
+.phase .ph h2 { display: flex; gap: 10px; align-items: baseline; }
+.phase .ph h2 .pn { font-family: var(--display); font-weight: 400; font-size: 28px; color: var(--accent); }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.checks label { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; padding: 8px; border-radius: 10px; cursor: pointer; }
+.checks label:hover { background: var(--soft); }
+.checks input { width: 18px; height: 18px; accent-color: var(--accent); }
+.checks .done span.lbl { color: var(--muted); text-decoration: line-through; }
+.checks .role { font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
+.prio { font: inherit; font-size: 12px; border: 1px solid var(--line); border-radius: 99px; padding: 3px 8px; background: var(--surface); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.donuts { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.donut { display: grid; grid-template-columns: 104px 1fr; gap: 14px; align-items: center; padding: 12px; border-radius: 14px; background: var(--soft); text-align: left; border: 0; width: 100%; }
+.donut svg { width: 104px; height: 104px; display: block; }
+.donut svg circle.seg { transition: stroke-width .15s; }
+.donut svg circle.seg:hover { stroke-width: 16; }
+.donut .dn { font-weight: 700; display: flex; align-items: center; gap: 6px; min-width: 0; overflow-wrap: anywhere; }
+.donut dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 6px 0 0; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.donut dd { margin: 0; color: var(--ink); text-align: right; }
+.mx { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mxq { border-top: 4px solid var(--qc); }
+.mxq .qk { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--qc); }
+.mxq h2 { font-family: var(--display); font-weight: 400; font-size: 28px; color: var(--qc); }
+.mq1 { --qc: #8a3fb0; } .mq2 { --qc: var(--accent); } .mq3 { --qc: var(--warn); } .mq4 { --qc: var(--bad); }
+.task { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: start; padding: 8px; border-radius: 10px; }
+.task:hover { background: var(--soft); }
+.task input[type=checkbox] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--qc, var(--accent)); }
+.task .tt { min-width: 0; overflow-wrap: anywhere; font-weight: 600; }
+.task.done .tt { text-decoration: line-through; color: var(--muted); font-weight: 500; }
+.task .tm { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 3px; font-size: 12px; color: var(--muted); font-weight: 400; }
+.task .ta { display: flex; gap: 4px; align-items: center; }
+.task .ta select, .task .ta button { font-size: 12px; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 2px 6px; color: var(--muted); }
+.task .ta button.sure { color: var(--bad); border-color: var(--bad); }
+form.quick { display: flex; flex-wrap: wrap; gap: 8px; }
+form.quick input[type=text] { flex: 1 1 220px; min-width: 0; border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 8px 14px; }
+form.quick select, form.quick input[type=date] { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 7px 10px; font-size: 13px; }
+@media (max-width: 760px) { .mx { grid-template-columns: 1fr; } }
+.note { font-size: 13px; color: var(--muted); border-left: 3px solid var(--line); padding-left: 12px; max-width: 75ch; }
+
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  aside.side { position: static; height: auto; padding-block: 14px 10px; padding-right: max(16px, env(safe-area-inset-right, 0px)); gap: 10px; }
+  .side .foot, .menu .group { display: none; }
+  nav.menu { grid-auto-flow: column; grid-auto-columns: max-content; overflow-x: auto; }
+  .brand img { width: 110px; } .brand small, .brand::after { display: none; }
+  .grid > * { grid-column: span 12; }
+  .two { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: no-preference) { .card, .row, .btn { transition: border-color .15s, background .15s; } }
+</style>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand"><img src="data:image/png;base64,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" alt="nexo" width="360" height="95"><small>CENTRAL DE GESTÃO</small></div>
+    <nav class="menu" id="menu" aria-label="Seções">
+      <div class="group">Geral</div>
+      <button type="button" data-view="geral">Visão geral</button>
+      <button type="button" data-view="matriz" id="nav-matriz" hidden>Minha matriz <span class="lock">só você</span></button>
+      <button type="button" data-view="equipe">Equipe <span class="badge" id="b-equipe"></span></button>
+      <div class="group">Conteúdo</div>
+      <button type="button" data-view="conteudo">Conteúdo <span class="badge" id="b-conteudo"></span></button>
+      <button type="button" data-view="aprovacao">Aprovação <span class="badge" id="b-aprovacao"></span></button>
+      <button type="button" data-view="painel">Painel por cliente</button>
+      <div class="group">Método iMed</div>
+      <button type="button" data-view="medico">Marketing médico <span class="badge" id="b-medico"></span></button>
+      <div class="group">Operação</div>
+      <button type="button" data-view="demandas">Demandas <span class="badge" id="b-demandas"></span></button>
+      <button type="button" data-view="clientes">Clientes</button>
+      <button type="button" data-view="trafego">Tráfego pago <span class="badge" id="b-trafego"></span></button>
+      <button type="button" data-view="financeiro" id="nav-fin" hidden>Financeiro <span class="lock">só você</span></button>
+    </nav>
+    <div class="foot">Mande demandas para o Claude por texto ou áudio. Ele organiza aqui.</div>
+  </aside>
+  <main id="main">
+    <div class="crumb">Carregando</div>
+    <h1>Abrindo a <em>central</em>…</h1>
+    <p class="lede">Clientes, calendário de conteúdo, aprovações, tráfego pago e financeiro.</p>
+  </main>
+</div>
+
+<dialog class="drawer" id="drawer"><form id="dform" method="dialog"></form></dialog>
+
+<script>
+(function () {
+  const ST = [["pauta", "Pauta"], ["texto", "Roteiro e legenda"], ["producao", "Produção"], ["aprovacao", "Aprovação do cliente"], ["aprovado", "Aprovado"], ["agendado", "Agendado"], ["publicado", "Publicado"]];
+  const STN = Object.fromEntries(ST);
+  const FORMATS = ["Post", "Carrossel", "Reels", "Stories", "Vídeo"];
+  const PEOPLE = ["Luiza", "Vitor", "Maju", "Apresentadores", "Cliente"];
+  const TR_KIND = ["Demanda", "Campanha", "Acompanhamento", "Atualização"];
+  const TR_ST = [["aberto", "Aberto"], ["andamento", "Em andamento"], ["cliente", "Aguardando cliente"], ["feito", "Concluído"]];
+  const FIN_KIND = [["receber", "Recebimento"], ["pagar", "Pagamento a parceiro"], ["gasto", "Gasto"], ["investimento", "Investimento"], ["imposto", "Imposto / nota fiscal"]];
+  const FKN = Object.fromEntries(FIN_KIND);
+  const MES = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+
+  // Marketing médico: implantação e rotina seguem o fluxograma "processo comunicação"; pilares seguem a proposta do Método iMed
+  // item: [chave, tarefa, função, marcador (POP/Script), condição da gravação]
+  const IMPL = [
+    { id: "pre", title: "Pré-onboarding", sub: "Do sim do médico até o repasse para a estrategista.", items: [
+      ["pre1", "Enviar dados do cliente", "Comercial", "POP"], ["pre2", "Elaborar contrato", "Adm./Fin.", "POP"],
+      ["pre3", "Subir contrato no ClickSign", "Adm./Fin.", "POP"], ["pre4", "Cobrar o cliente para assinar", "Adm./Fin.", "POP"],
+      ["pre5", "Contrato assinado", "Adm./Fin.", ""], ["pre6", "Inserir previsão de entrada no Conta Azul", "Adm./Fin.", "POP"],
+      ["pre7", "Encaminhar contato e tipo de pacote para a estrategista", "Adm./Fin.", ""]] },
+    { id: "ci", title: "Contato inicial", sub: "Estrategista abre o relacionamento.", items: [
+      ["ci1", "Criar pasta no Google Drive", "Estrategista", "POP"], ["ci2", "Criar grupo do WhatsApp", "Estrategista", "POP"],
+      ["ci3", "Enviar mensagens de introdução", "Estrategista", "Script"], ["ci4", "Agendar Reunião #00", "Estrategista", ""]] },
+    { id: "r00", title: "Reunião #00", sub: "Diagnóstico do médico e do negócio.", items: [
+      ["r1", "Pesquisa de nicho (IAs, YouTube, Wikipédia)", "Estrategista", "POP"], ["r2", "Organizar diagnóstico e lista de perguntas", "Estrategista", "POP"],
+      ["r3", "Confirmar a reunião 2 dias antes", "Estrategista", ""], ["r4", "Reunião #00 · diagnóstico", "Estrategista", ""],
+      ["r5", "Registrar as informações no Google Docs", "Estrategista", "POP"], ["r6", "Cobrar senhas das redes sociais", "Estrategista", "Script"],
+      ["r7", "Solicitar identidade visual ao cliente", "Estrategista", "POP"]] },
+    { id: "pos", title: "Posicionamento", sub: "Posicionamento definido e aplicado no perfil.", items: [
+      ["po1", "Definição de posicionamento (Google Docs)", "Estrategista", "POP"], ["po2", "Criação da proposta de bio", "Estrategista", "POP"],
+      ["po3", "Solicitar aplicação da identidade visual", "Estrategista", "POP"], ["po4", "Entregar aplicação da identidade visual", "Designer", ""]] },
+    { id: "le", title: "Linha editorial", sub: "Linha editorial aprovada e 1ª leva encaminhada.", items: [
+      ["le1", "Brainstorming de conteúdos com IA", "Estrategista", "POP"], ["le2", "Desenho da linha editorial", "Estrategista", "POP"],
+      ["le3", "Confirmar Reunião #01 2 dias antes", "Estrategista", ""], ["le4", "Reunião #01 · posicionamento e linha editorial", "Estrategista", "POP"],
+      ["le5", "Alinhamento com a social media", "Estrategista", ""],
+      ["le6", "Agendar data de gravação da 1ª leva", "Estrategista", "", "sim"], ["le7", "Gravação com o cliente", "Videomaker", "POP", "sim"],
+      ["le8", "Agendar data de envio da 1ª leva", "Estrategista", "", "nao"]] },
+    { id: "sm", title: "Contato inicial · social media", sub: "Social media assume a operação.", items: [
+      ["sm1", "Explicar os processos ao cliente", "Social media", "POP"], ["sm2", "Configurar o MLabs", "Social media", "POP"]] },
+  ];
+  const ROUT = [
+    { id: "prod", title: "Produção", items: [
+      ["pr1", "Iniciar o ClickUp de Instagram do mês", "Social media", ""], ["pr2", "Orientar o cliente a produzir textos", "Social media", ""],
+      ["pr3", "Produzir artes (posts fixos e carrosséis)", "Designer", ""], ["pr4", "Editar vídeos para Reels", "Videomaker", ""],
+      ["pr5", "Produzir thumbnails", "Designer", ""], ["pr6", "Aprovação dos conteúdos com o cliente", "Social media", "Script"],
+      ["pr7", "Agendamento das postagens", "Social media", "POP"]] },
+    { id: "acomp", title: "Acompanhamento", items: [
+      ["ac1", "Responder perguntas do cliente", "Social media", ""], ["ac2", "Produzir guia de stories", "Estrategista", ""],
+      ["ac3", "Dar feedback dos stories", "Social media", ""], ["ac4", "Resolver crises e dúvidas estratégicas", "Estrategista", ""]] },
+    { id: "rel", title: "Relatório e nova linha", items: [
+      ["re1", "Relatório do mês anterior (início do mês)", "Social media", "POP"], ["re2", "Apresentação do relatório", "Estrategista", "POP"],
+      ["re3", "Criação da nova linha editorial", "Estrategista", ""]] },
+  ];
+  const PILLARS = [
+    { id: "p1", n: "01", title: "Posicionamento", sub: "Clareza de posicionamento e percepção de valor no digital.", items: [
+      ["p1a", "Diagnóstico estratégico do perfil e do negócio"], ["p1b", "Otimização do Perfil da Empresa no Google"], ["p1c", "Otimização da reputação e presença digital"],
+      ["p1d", "Estratégia de posicionamento da marca médica"], ["p1e", "Posicionamento estratégico no Instagram e Facebook"], ["p1f", "Definição de bio, destaques e links"]] },
+    { id: "p2", n: "02", title: "Conteúdo", sub: "Conteúdo estratégico para gerar confiança e interesse.", items: [
+      ["p2a", "Planejamento editorial estratégico"], ["p2b", "Roteiros para Reels, conteúdos e anúncios"], ["p2c", "Direção e orientação de gravação para o médico"],
+      ["p2d", "Edição de Reels e conteúdos digitais"], ["p2e", "Desenvolvimento de criativos estáticos"], ["p2f", "Adequação da comunicação às normas do CFM"]] },
+    { id: "p3", n: "03", title: "Distribuição", sub: "Oportunidades qualificadas por mídia e canais digitais.", items: [
+      ["p3a", "Meta Ads e/ou Google Ads, conforme estratégia"], ["p3b", "Campanhas de reconhecimento, interesse e captação"], ["p3c", "Estratégias de busca para intenção e urgência"],
+      ["p3d", "Landing pages ou formulários, quando aplicável"], ["p3e", "Rastreamento da origem e performance dos leads"]] },
+    { id: "p4", n: "04", title: "Atendimento", sub: "Processo estruturado para transformar oportunidades em agendamentos.", items: [
+      ["p4a", "Mapeamento do processo de atendimento"], ["p4b", "Treinamento comercial da secretária / equipe"], ["p4c", "Scripts de primeiro contato, qualificação e follow-up"],
+      ["p4d", "Rotina de acompanhamento comercial"], ["p4e", "CRM e ferramentas de gestão, quando aplicável"], ["p4f", "Indicadores de atendimento e conversão"]] },
+    { id: "p5", n: "05", title: "Reativação de base", sub: "Novas oportunidades a partir da base já existente.", items: [
+      ["p5a", "Estratégia de reativação da base"], ["p5b", "Segmentação de pacientes com a clínica"], ["p5c", "Scripts e campanhas de reativação"],
+      ["p5d", "Acompanhamento de respostas, retornos e agendamentos"], ["p5e", "Indicadores de reativação e retorno"]] },
+  ];
+  const MED_ROLES = ["Estrategista", "Social media", "Designer", "Videomaker", "Adm./Fin.", "Comercial"];
+  const MED_ST = [["prospeccao", "Prospecção"], ["proposta", "Proposta enviada"], ["implantacao", "Implantação"], ["operacao", "Em operação"], ["pausado", "Pausado"], ["perdido", "Não fechou"]];
+
+  // Quem é quem na equipe: funções do processo de médicos que caem para cada pessoa
+  const TEAM = [{ name: "Vitor", roles: ["Designer"], what: "Posts, carrosséis, artes e layouts" }, { name: "Maju", roles: ["Videomaker"], what: "Edição de vídeos e Reels" },
+    { name: "Luiza", roles: ["Estrategista", "Social media", "Adm./Fin.", "Comercial"], what: "Estratégia, social media e gestão" }];
+  const DEM_ST = [["afazer", "A fazer"], ["fazendo", "Fazendo"], ["aprovacao", "Com o cliente"], ["feito", "Feito"]];
+  const DEM_KIND = ["Arte avulsa", "Post extra / informativo", "Vídeo", "Layout / impresso", "Campanha promocional", "Evento", "Site / domínio / Google", "Ajuste de perfil", "Outro"];
+  const QN = { 1: ["Importante e urgente", "Faça agora"], 2: ["Importante, não urgente", "Agende"], 3: ["Urgente, não importante", "Delegue"], 4: ["Nem urgente nem importante", "Elimine"] };
+  const uid = (p) => p + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+
+  const S = { matriz: [], demandas: [], person: null, mxDel: null, clients: [], posts: [], traffic: [], fin: [], finrec: [], brand: {}, metrics: {}, medicos: [], med: null, medMonth: null, owner: false, ready: false, err: "",
+    view: "geral", filter: "all", mode: "quadro", calMonth: null, finMonth: null, confirmDel: false, pc: null, rmPending: null, uploading: false };
+  let db = null, assets = null;
+
+  const $ = (s, r) => (r || document).querySelector(s);
+  const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const pad = (n) => String(n).padStart(2, "0");
+  const iso = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const today = () => iso(new Date());
+  const monthOf = (s) => (s || "").slice(0, 7);
+  const thisMonth = () => today().slice(0, 7);
+  const addMonth = (m, k) => { const [y, mo] = m.split("-").map(Number); const d = new Date(y, mo - 1 + k, 1); return d.getFullYear() + "-" + pad(d.getMonth() + 1); };
+  const monthLabel = (m) => { const [y, mo] = m.split("-").map(Number); return MES[mo - 1] + " de " + y; };
+  const dShort = (s) => { if (!s) return ""; const [y, m, d] = s.split("-"); return d + "/" + m; };
+  const brl = (v) => (Number(v) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  const client = (id) => S.clients.find((c) => c.id === id);
+  const cname = (id) => (client(id) || {}).name || "Sem cliente";
+  const ccolor = (id) => (client(id) || {}).color || "var(--muted)";
+  const byDate = (a, b) => (a.date || "9999") < (b.date || "9999") ? -1 : (a.date || "9999") > (b.date || "9999") ? 1 : 0;
+  const visPosts = () => S.posts.filter((p) => S.filter === "all" || p.clientId === S.filter);
+
+  function setErr(m) { S.err = m; render(); }
+
+  // ---------- data ----------
+  async function save(col, id, data) {
+    try { if (id) await db.collection(col).doc(id).set(data); else await db.collection(col).add(data); return true; }
+    catch (e) { setErr("Não consegui salvar. Confira a conexão e tente de novo."); return false; }
+  }
+  async function patch(col, id, data) {
+    try { await db.collection(col).doc(id).update(data); } catch (e) { setErr("Não consegui salvar a mudança. Tente de novo."); }
+  }
+  async function del(col, id) {
+    try { await db.collection(col).doc(id).delete(); } catch (e) { setErr("Não consegui apagar. Tente de novo."); }
+  }
+  function listen(col, key, sortFn) {
+    db.collection(col).onSnapshot((snap) => {
+      S[key] = snap.docs.map((d) => Object.assign({ id: d.id }, d.data()));
+      if (sortFn) S[key].sort(sortFn);
+      S.ready = true; render();
+    }, (e) => setErr(e.code === "revoked" ? "Seu acesso a esta central foi encerrado." : "Perdi a conexão com os dados. Recarregue a página."));
+  }
+
+  function listenMap(col, key) {
+    db.collection(col).onSnapshot((snap) => {
+      S[key] = {}; for (const d of snap.docs) S[key][d.id] = d.data();
+      render();
+    }, () => {});
+  }
+
+  // ---------- drawer ----------
+  function openDrawer(title, fields, values, onSave, onDelete) {
+    const f = $("#dform");
+    S.confirmDel = false;
+    const fieldHtml = (fd) => {
+      const v = values[fd.id];
+      const id = "f-" + fd.id;
+      if (fd.type === "row") return '<div class="two">' + fd.fields.map(fieldHtml).join("") + "</div>";
+      if (fd.type === "check") return '<div class="field check"><input type="checkbox" id="' + id + '"' + (v ? " checked" : "") + '><label for="' + id + '">' + esc(fd.label) + "</label></div>";
+      let input;
+      if (fd.type === "select") input = '<select id="' + id + '">' + fd.options.map((o) => { const [ov, ol] = Array.isArray(o) ? o : [o, o]; return '<option value="' + esc(ov) + '"' + (String(v) === String(ov) ? " selected" : "") + ">" + esc(ol) + "</option>"; }).join("") + "</select>";
+      else if (fd.type === "textarea") input = '<textarea id="' + id + '" placeholder="' + esc(fd.ph || "") + '">' + esc(v) + "</textarea>";
+      else input = '<input id="' + id + '" type="' + (fd.type || "text") + '"' + (fd.type === "number" ? ' step="0.01" inputmode="decimal"' : "") + ' value="' + esc(v) + '" placeholder="' + esc(fd.ph || "") + '"' + (fd.required ? " required" : "") + ">";
+      return '<div class="field"><label for="' + id + '">' + esc(fd.label) + "</label>" + input + "</div>";
+    };
+    f.innerHTML = '<div class="dhead"><h3>' + esc(title) + '</h3><button type="button" class="btn ghost" id="d-close">Fechar</button></div>' +
+      fields.map(fieldHtml).join("") +
+      '<div class="dfoot"><div>' + (onDelete ? '<button type="button" class="btn danger" id="d-del">Apagar</button>' : "") + '</div><button type="submit" class="btn primary">Salvar</button></div>';
+    const flat = fields.flatMap((fd) => fd.type === "row" ? fd.fields : [fd]);
+    f.onsubmit = async (ev) => {
+      ev.preventDefault();
+      const out = {};
+      for (const fd of flat) {
+        const el = $("#f-" + fd.id);
+        if (fd.type === "check") out[fd.id] = el.checked;
+        else if (fd.type === "number") out[fd.id] = el.value === "" ? null : Number(el.value);
+        else out[fd.id] = el.value.trim();
+      }
+      if (await onSave(out) !== false) $("#drawer").close();
+    };
+    $("#d-close").onclick = () => $("#drawer").close();
+    if (onDelete) $("#d-del").onclick = async (ev) => {
+      if (!S.confirmDel) { S.confirmDel = true; ev.target.textContent = "Clique de novo para apagar"; return; }
+      await onDelete(); $("#drawer").close();
+    };
+    $("#drawer").showModal();
+  }
+  const clientOpts = () => S.clients.map((c) => [c.id, c.name]);
+
+  function editPost(p, preset) {
+    p = p || Object.assign({ status: "pauta", format: "Post", owner: "Luiza", clientId: S.filter !== "all" ? S.filter : (S.clients[0] || {}).id }, preset || {});
+    openDrawer(p.id ? "Conteúdo" : "Novo conteúdo", [
+      { id: "title", label: "Título / pauta", required: true, ph: "Ex.: 3 erros ao pedir o auxílio-acidente" },
+      { type: "row", fields: [{ id: "clientId", label: "Cliente", type: "select", options: clientOpts() }, { id: "format", label: "Formato", type: "select", options: FORMATS }] },
+      { type: "row", fields: [{ id: "date", label: "Data de postagem", type: "date" }, { id: "time", label: "Horário", type: "time" }] },
+      { type: "row", fields: [{ id: "status", label: "Etapa", type: "select", options: ST }, { id: "owner", label: "Responsável", type: "select", options: PEOPLE }] },
+      { id: "caption", label: "Legenda", type: "textarea", ph: "Texto que vai no post" },
+      { id: "script", label: "Roteiro / texto das telas", type: "textarea", ph: "Roteiro do vídeo ou texto de cada tela do carrossel" },
+      { id: "refs", label: "Referências", type: "textarea", ph: "Links de referência do nicho" },
+      { id: "link", label: "Link da entrega no Drive (arte ou vídeo final)", type: "url", ph: "https://" },
+      { id: "feedback", label: "Retorno do cliente", type: "textarea" },
+    ], p, async (v) => {
+      const data = Object.assign({}, p, v); delete data.id;
+      if (!p.id) data.created = new Date().toISOString();
+      return save("posts", p.id, data);
+    }, p.id ? () => del("posts", p.id) : null);
+  }
+
+  function editClient(c) {
+    c = c || { color: "#2b3fd9" };
+    openDrawer(c.id ? c.name : "Novo cliente", [
+      { id: "name", label: "Nome", required: true },
+      { type: "row", fields: [{ id: "niche", label: "Nicho" }, { id: "color", label: "Cor no calendário", type: "color" }] },
+      { id: "services", label: "Serviços contratados", type: "textarea" },
+      { id: "rhythm", label: "Ritmo de conteúdo", ph: "Ex.: seg promo, qua vídeo, sex dica" },
+      { id: "team", label: "Equipe e contatos do cliente", type: "textarea" },
+      { id: "instagram", label: "Instagram", ph: "@perfil" },
+      { id: "drive", label: "Pasta do Drive do cliente", type: "url", ph: "https://drive.google.com/…" },
+      { type: "row", fields: [{ id: "drive2", label: "Segunda pasta (opcional)", type: "url", ph: "https://" }, { id: "drive2Label", label: "Nome da segunda pasta", ph: "Ex.: Maxx Atacadista" }] },
+      { id: "notes", label: "Contexto do negócio", type: "textarea" },
+    ], c, async (v) => { const data = Object.assign({}, c, v); delete data.id; return save("clients", c.id, data); },
+    c.id ? () => del("clients", c.id) : null);
+  }
+
+  function editTraffic(t) {
+    t = t || { status: "aberto", kind: "Demanda", clientId: S.filter !== "all" ? S.filter : (S.clients[0] || {}).id };
+    openDrawer(t.id ? "Tráfego" : "Nova demanda de tráfego", [
+      { id: "title", label: "O que é", required: true },
+      { type: "row", fields: [{ id: "clientId", label: "Cliente", type: "select", options: clientOpts() }, { id: "kind", label: "Tipo", type: "select", options: TR_KIND }] },
+      { type: "row", fields: [{ id: "status", label: "Situação", type: "select", options: TR_ST }, { id: "due", label: "Prazo", type: "date" }] },
+      { type: "row", fields: [{ id: "budget", label: "Verba (R$)", type: "number" }, { id: "store", label: "Loja / conta", ph: "Ex.: Luziânia" }] },
+      { id: "updates", label: "Atualizações e números", type: "textarea", ph: "Ex.: 30/10 · CPL R$ 12,40 · 38 leads" },
+      { id: "link", label: "Link (Gerenciador, relatório)", type: "url", ph: "https://" },
+    ], t, async (v) => { const data = Object.assign({}, t, v); delete data.id; if (!t.id) data.created = new Date().toISOString(); return save("traffic", t.id, data); },
+    t.id ? () => del("traffic", t.id) : null);
+  }
+
+  function editFin(e) {
+    e = e || { kind: "receber", status: "pendente", date: S.finMonth + "-" + pad(Math.min(new Date().getDate(), 28)) };
+    openDrawer(e.id ? "Lançamento" : "Novo lançamento", [
+      { id: "desc", label: "Descrição", required: true },
+      { type: "row", fields: [{ id: "kind", label: "Tipo", type: "select", options: FIN_KIND }, { id: "amount", label: "Valor (R$)", type: "number", required: true }] },
+      { type: "row", fields: [{ id: "date", label: "Vencimento", type: "date", required: true }, { id: "status", label: "Situação", type: "select", options: [["pendente", "Pendente"], ["pago", "Pago / recebido"]] }] },
+      { id: "clientId", label: "Cliente ou parceiro", type: "select", options: [["", "Nenhum"]].concat(clientOpts()) },
+      { id: "partner", label: "Parceiro (se for pagamento)", ph: "Ex.: Vitor, Maju" },
+      { id: "nf", label: "Nota fiscal emitida", type: "check" },
+      { id: "notes", label: "Observações", type: "textarea" },
+    ], e, async (v) => { const data = Object.assign({}, e, v); delete data.id; return save("fin", e.id, data); },
+    e.id ? () => del("fin", e.id) : null);
+  }
+
+  function editBrand(cid) {
+    const b = S.brand[cid] || {};
+    openDrawer("Guia · " + cname(cid), [
+      { id: "editorial", label: "Linha editorial", type: "textarea", ph: "Do que este perfil fala, para quem e com qual objetivo" },
+      { id: "pillars", label: "Pilares de conteúdo", type: "textarea", ph: "Um por linha. Ex.: Direitos do trabalhador acidentado" },
+      { type: "row", fields: [{ id: "tone", label: "Tom de voz", ph: "Ex.: didático, acolhedor, direto" }, { id: "audience", label: "Público", ph: "Ex.: trabalhador CLT 30–55 anos" }] },
+      { id: "fonts", label: "Fontes", ph: "Títulos: … · Texto: …" },
+      { id: "colors", label: "Cores (códigos)", ph: "#1a3a51, #00b3a1, #ffffff" },
+      { id: "dos", label: "Fazer", type: "textarea" },
+      { id: "donts", label: "Evitar", type: "textarea", ph: "Ex.: termos que a OAB/CFM não permite" },
+      { id: "links", label: "Links de referência", type: "textarea", ph: "Um por linha: https://… — o que tem de bom" },
+    ], b, async (v) => save("brand", cid, Object.assign({}, b, v)));
+  }
+
+  async function uploadFiles(cid, field, files) {
+    if (!assets) { setErr("Só quem é editor da central consegue enviar arquivos."); return; }
+    S.uploading = true; render();
+    const list = ((S.brand[cid] || {})[field] || []).slice();
+    for (const f of files) {
+      try { const r = await assets.upload(f); list.push({ id: r.id, url: r.url, name: f.name, type: r.contentType || f.type }); }
+      catch (e) { S.err = "Não consegui enviar " + f.name + ". Imagens e PDFs de até 20 MB funcionam."; }
+    }
+    S.uploading = false;
+    await save("brand", cid, Object.assign({}, S.brand[cid] || {}, { [field]: list }));
+    render();
+  }
+
+  async function removeFile(cid, field, idx) {
+    const b = S.brand[cid] || {}; const list = (b[field] || []).slice(); const item = list[idx];
+    if (!item) return;
+    list.splice(idx, 1);
+    await save("brand", cid, Object.assign({}, b, { [field]: list }));
+    if (assets && item.id) { try { await assets.delete(item.id); } catch (e) {} }
+  }
+
+  function editRec(r) {
+    r = r || { kind: "receber", day: 5 };
+    openDrawer(r.id ? "Recorrente" : "Novo recorrente", [
+      { id: "desc", label: "Descrição", required: true },
+      { type: "row", fields: [{ id: "kind", label: "Tipo", type: "select", options: FIN_KIND }, { id: "amount", label: "Valor (R$)", type: "number", required: true }] },
+      { type: "row", fields: [{ id: "day", label: "Dia do mês", type: "number" }, { id: "clientId", label: "Cliente", type: "select", options: [["", "Nenhum"]].concat(clientOpts()) }] },
+      { id: "partner", label: "Parceiro (se for pagamento)" },
+    ], r, async (v) => { const data = Object.assign({}, r, v); delete data.id; return save("finrec", r.id, data); },
+    r.id ? () => del("finrec", r.id) : null);
+  }
+
+  // ---------- views ----------
+  function postRow(p) {
+    return '<li><button type="button" class="row" data-post="' + p.id + '" style="--c:' + esc(ccolor(p.clientId)) + '"><span class="dot"></span><span class="t">' + esc(p.title) +
+      '<div class="s">' + esc(cname(p.clientId)) + " · " + esc(p.format || "") + (p.owner ? " · " + esc(p.owner) : "") + '</div></span><span class="pill">' + (p.date ? dShort(p.date) : "sem data") + "</span></button></li>";
+  }
+  function trStatusPill(s) { const cls = { aberto: "warn", andamento: "acc", cliente: "bad", feito: "ok" }[s] || ""; return '<span class="pill ' + cls + '">' + esc((TR_ST.find((x) => x[0] === s) || [, s])[1]) + "</span>"; }
+
+  function vGeral() {
+    const h = new Date().getHours();
+    const hi = h < 12 ? "Bom dia" : h < 18 ? "Boa tarde" : "Boa noite";
+    const t = today(), m = thisMonth();
+    const lim = iso(new Date(Date.now() + 7 * 864e5));
+    const todayPosts = S.posts.filter((p) => p.date === t && p.status !== "publicado");
+    const appr = S.posts.filter((p) => p.status === "aprovacao");
+    const next = S.posts.filter((p) => p.date && p.date >= t && p.date <= lim && p.status !== "publicado").sort(byDate);
+    const late = S.posts.filter((p) => p.date && p.date < t && !["agendado", "publicado"].includes(p.status));
+    const mp = S.posts.filter((p) => monthOf(p.date) === m);
+    const tr = S.traffic.filter((x) => x.status !== "feito");
+    let fin = "";
+    if (S.owner) {
+      const fm = S.fin.filter((e) => monthOf(e.date) === m);
+      const rec = fm.filter((e) => e.kind === "receber");
+      const aR = rec.filter((e) => e.status !== "pago").reduce((s, e) => s + (Number(e.amount) || 0), 0);
+      const R = rec.filter((e) => e.status === "pago").reduce((s, e) => s + (Number(e.amount) || 0), 0);
+      fin = '<section class="panel dark c4"><div class="ph"><h2>Financeiro de ' + esc(MES[new Date().getMonth()]) + '</h2><span class="k">só você vê</span></div>' +
+        '<div><div class="k">A receber</div><div class="big">' + brl(aR) + '</div></div><div class="muted">Recebido: ' + brl(R) + "</div>" +
+        '<button type="button" class="btn" data-go="financeiro">Abrir financeiro</button></section>';
+    }
+    const dOpen = S.demandas.filter((d) => d.status !== "feito").sort((a, b) => byDate({ date: a.due }, { date: b.due }));
+    const dLate = dOpen.filter((d) => d.due && d.due <= t).length;
+    return '<div class="head"><div><div class="crumb">Geral / Visão geral</div><h1>' + hi + (S.owner ? ", <em>Luiza</em>" : ", <em>equipe</em>") + "</h1>" +
+      '<p class="lede">' + (todayPosts.length ? todayPosts.length + " conteúdo" + (todayPosts.length > 1 ? "s" : "") + " marcado" + (todayPosts.length > 1 ? "s" : "") + " para hoje. " : "Nenhum conteúdo marcado para hoje. ") +
+      (dOpen.length ? dOpen.length + " demanda" + (dOpen.length > 1 ? "s" : "") + " em aberto" + (dLate ? ", " + dLate + " vencendo hoje ou atrasada" + (dLate > 1 ? "s" : "") : "") + ". " : "") +
+      (appr.length ? appr.length + " esperando aprovação do cliente." : "") + (late.length ? " " + late.length + " conteúdo" + (late.length > 1 ? "s" : "") + " atrasado" + (late.length > 1 ? "s" : "") + "." : "") + '</p></div>' +
+      '<div class="toolbar"><button type="button" class="btn primary" data-new="dem">Nova demanda</button><button type="button" class="btn" data-new="post">Novo conteúdo</button><button type="button" class="btn" data-new="traffic">Demanda de tráfego</button></div></div>' +
+      '<div class="grid">' +
+      '<section class="panel ' + (S.owner ? "c8" : "c12") + '"><div class="ph"><h2>Fluxo de ' + esc(MES[new Date().getMonth()]) + '</h2><span class="k">' + mp.length + ' conteúdos no mês</span></div><div class="flow">' +
+      ST.map(([k, l]) => '<div><div class="n">' + mp.filter((p) => p.status === k).length + '</div><div class="l">' + esc(l) + "</div></div>").join("") + "</div></section>" + fin +
+      demFlow() + progressPanel() +
+      '<section class="panel c7"><div class="ph"><h2>Demandas em aberto</h2><button type="button" class="btn ghost" data-go="demandas">Abrir demandas</button></div><ul class="list">' +
+      (dOpen.length ? dOpen.slice(0, 8).map(demListRow).join("") : '<li class="empty">Nenhuma demanda em aberto.</li>') + "</ul></section>" +
+      '<section class="panel c5"><div class="ph"><h2>Conteúdo · próximos 7 dias</h2><button type="button" class="btn ghost" data-go="conteudo">Calendário</button></div><ul class="list">' +
+      (next.length ? next.slice(0, 8).map(postRow).join("") : '<li class="empty">Nada marcado para os próximos 7 dias.</li>') + "</ul></section>" +
+      '<section class="panel c6"><div class="ph"><h2>Esperando aprovação</h2><span class="k">' + appr.length + '</span></div><ul class="list">' +
+      (appr.length ? appr.sort(byDate).slice(0, 6).map(postRow).join("") : '<li class="empty">Nenhum conteúdo com o cliente agora.</li>') + "</ul></section>" +
+      '<section class="panel c6"><div class="ph"><h2>Tráfego em aberto</h2><button type="button" class="btn ghost" data-go="trafego">Abrir tráfego</button></div><ul class="list">' +
+      (tr.length ? tr.slice(0, 6).map((x) => '<li><button type="button" class="row" data-traffic="' + x.id + '" style="--c:' + esc(ccolor(x.clientId)) + '"><span class="dot"></span><span class="t">' + esc(x.title) + '<div class="s">' + esc(cname(x.clientId)) + " · " + esc(x.kind || "") + "</div></span>" + trStatusPill(x.status) + "</button></li>").join("") : '<li class="empty">Nenhuma demanda aberta.</li>') +
+      "</ul></section>" +
+      (late.length ? '<section class="panel c12"><div class="ph"><h2>Conteúdos atrasados</h2><span class="pill bad">' + late.length + '</span></div><ul class="list">' + late.sort(byDate).slice(0, 6).map(postRow).join("") + "</ul></section>" : "") + "</div>";
+  }
+
+  // Fluxo de demandas do mês: pedidas no mês, situação atual das abertas e concluídas no mês
+  function demFlow() {
+    const m = thisMonth();
+    const asked = S.demandas.filter((d) => monthOf(d.created) === m).length;
+    const cnt = (s) => S.demandas.filter((d) => d.status === s).length;
+    const done = S.demandas.filter((d) => d.status === "feito" && monthOf(d.doneAt) === m).length;
+    const cells = [["Pedidas no mês", asked], ["A fazer", cnt("afazer")], ["Em produção", cnt("fazendo")], ["Com o cliente", cnt("aprovacao")], ["Concluídas no mês", done]];
+    return '<section class="panel c12"><div class="ph"><h2>Fluxo de demandas de ' + esc(MES[new Date().getMonth()]) + '</h2><button type="button" class="btn ghost" data-go="demandas">Abrir demandas</button></div><div class="flow">' +
+      cells.map(([l, n]) => '<div><div class="n">' + n + '</div><div class="l">' + esc(l) + "</div></div>").join("") + "</div></section>";
+  }
+
+  // Progresso por cliente: conteúdos do mês + demandas abertas ou concluídas no mês
+  function clientProgress(cid) {
+    const m = thisMonth(); const r = { todo: 0, doing: 0, done: 0 };
+    for (const p of S.posts) if (p.clientId === cid && monthOf(p.date) === m) r[p.status === "pauta" || !p.status ? "todo" : ["aprovado", "agendado", "publicado"].includes(p.status) ? "done" : "doing"]++;
+    for (const d of S.demandas) if (d.clientId === cid && (d.status !== "feito" || monthOf(d.doneAt) === m)) r[d.status === "feito" ? "done" : d.status === "afazer" ? "todo" : "doing"]++;
+    return r;
+  }
+  function donutSvg(r, name) {
+    const total = r.todo + r.doing + r.done, R = 40, C = 2 * Math.PI * R, gap = total > 1 ? 2 : 0;
+    const segs = [["done", "Feito", "var(--s-done)"], ["doing", "Em andamento", "var(--s-doing)"], ["todo", "Pedido, a fazer", "var(--s-todo)"]].filter(([k]) => r[k] > 0);
+    let off = 0;
+    const arcs = segs.map(([k, l, col]) => {
+      const len = (r[k] / total) * C; const vis = Math.max(len - (segs.length > 1 ? gap : 0), 0.5);
+      const s = '<circle class="seg" cx="52" cy="52" r="' + R + '" fill="none" stroke="' + col + '" stroke-width="14" stroke-dasharray="' + vis.toFixed(2) + " " + (C - vis).toFixed(2) + '" stroke-dashoffset="' + (-off).toFixed(2) + '" transform="rotate(-90 52 52)"><title>' + esc(name) + " · " + l + ": " + r[k] + " de " + total + "</title></circle>";
+      off += len; return s;
+    }).join("");
+    const pctDone = total ? Math.round((r.done / total) * 100) : 0;
+    return '<svg viewBox="0 0 104 104" role="img" aria-label="' + esc(name) + ": " + r.done + " feitos, " + r.doing + " em andamento, " + r.todo + ' a fazer">' +
+      '<circle cx="52" cy="52" r="' + R + '" fill="none" stroke="var(--line)" stroke-width="14"></circle>' + arcs +
+      '<text x="52" y="50" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink)" font-family="Manrope, system-ui, sans-serif">' + (total ? pctDone + "%" : "—") + "</text>" +
+      '<text x="52" y="66" text-anchor="middle" font-size="9" fill="var(--muted)" font-family="Manrope, system-ui, sans-serif">' + (total ? "feito" : "sem itens") + "</text></svg>";
+  }
+  function progressPanel() {
+    const cards = S.clients.map((c) => {
+      const r = clientProgress(c.id), total = r.todo + r.doing + r.done;
+      return '<button type="button" class="donut" data-pcgo="' + c.id + '" style="--c:' + esc(c.color) + '">' + donutSvg(r, c.name) +
+        '<div style="min-width:0"><div class="dn"><span class="dot"></span>' + esc(c.name) + "</div><dl><dt>Pedido no mês</dt><dd>" + total + "</dd><dt>Feito</dt><dd>" + r.done + "</dd><dt>Em andamento</dt><dd>" + r.doing + "</dd><dt>A fazer</dt><dd>" + r.todo + "</dd></dl></div></button>";
+    }).join("");
+    return '<section class="panel c12"><div class="ph"><h2>Progresso por cliente · ' + esc(MES[new Date().getMonth()]) + '</h2><div class="legend"><span><i style="background:var(--s-done)"></i>Feito</span><span><i style="background:var(--s-doing)"></i>Em andamento</span><span><i style="background:var(--s-todo)"></i>A fazer</span></div></div>' +
+      '<p class="muted" style="margin:0;font-size:12px">Soma os conteúdos planejados para o mês e as demandas abertas ou concluídas no mês. Clique no cliente para abrir o painel dele.</p>' +
+      '<div class="donuts">' + (cards || '<p class="empty">Nenhum cliente cadastrado.</p>') + "</div></section>";
+  }
+
+  function filterBar(extra) {
+    return '<div class="toolbar"><button type="button" class="chip" data-filter="all" aria-pressed="' + (S.filter === "all") + '">Todos</button>' +
+      S.clients.map((c) => '<button type="button" class="chip" data-filter="' + c.id + '" aria-pressed="' + (S.filter === c.id) + '" style="--c:' + esc(c.color) + '"><span class="dot"></span>' + esc(c.name) + "</button>").join("") +
+      '<span class="sp"></span>' + (extra || "") + "</div>";
+  }
+
+  function vConteudo() {
+    const posts = visPosts();
+    let body;
+    if (S.mode === "quadro") {
+      body = '<div class="kanban-wrap"><div class="kanban">' + ST.map(([k, l]) => {
+        const items = posts.filter((p) => (p.status || "pauta") === k).sort(byDate);
+        return '<section class="col" data-col="' + k + '"><div class="ch"><span>' + esc(l) + '</span><span class="pill">' + items.length + "</span></div>" +
+          items.map((p) => '<button type="button" class="card" draggable="true" data-post="' + p.id + '" style="--c:' + esc(ccolor(p.clientId)) + '"><span class="cl"><span class="dot"></span>' + esc(cname(p.clientId)) + '</span><span class="ct">' + esc(p.title) + '</span><span class="cm"><span class="pill">' + esc(p.format || "") + "</span>" + (p.date ? "<span>" + dShort(p.date) + (p.time ? " · " + esc(p.time) : "") + "</span>" : "") + (p.owner ? "<span>· " + esc(p.owner) + "</span>" : "") + (p.link ? '<span class="pill ok">no Drive</span>' : "") + "</span></button>").join("") +
+          "</section>";
+      }).join("") + "</div></div>";
+    } else {
+      const m = S.calMonth;
+      const [y, mo] = m.split("-").map(Number);
+      const first = new Date(y, mo - 1, 1);
+      const start = new Date(first); start.setDate(1 - ((first.getDay() + 6) % 7));
+      const t = today();
+      let cells = ["seg", "ter", "qua", "qui", "sex", "sáb", "dom"].map((d) => '<div class="dh">' + d + "</div>").join("");
+      for (let i = 0; i < 42; i++) {
+        const d = new Date(start); d.setDate(start.getDate() + i);
+        const ds = iso(d);
+        if (i >= 35 && d.getMonth() !== mo - 1) break;
+        const evs = posts.filter((p) => p.date === ds).sort((a, b) => (a.time || "") < (b.time || "") ? -1 : 1);
+        cells += '<div class="day' + (d.getMonth() !== mo - 1 ? " out" : "") + (ds === t ? " today" : "") + '"><div class="dn"><b>' + d.getDate() + '</b><button type="button" class="add" data-newdate="' + ds + '" aria-label="Novo conteúdo em ' + dShort(ds) + '">+</button></div>' +
+          evs.map((p) => '<button type="button" class="ev" data-post="' + p.id + '" style="--c:' + esc(ccolor(p.clientId)) + '"><span class="et">' + esc(p.title) + '</span><span class="es">' + esc(p.format || "") + " · " + esc(STN[p.status] || "") + "</span></button>").join("") + "</div>";
+      }
+      body = '<div class="toolbar"><button type="button" class="btn" data-cal="-1" aria-label="Mês anterior">←</button><h2 style="text-transform:capitalize">' + esc(monthLabel(m)) + '</h2><button type="button" class="btn" data-cal="1" aria-label="Próximo mês">→</button></div><div class="cal-wrap"><div class="cal">' + cells + "</div></div>";
+    }
+    return '<div class="head"><div><div class="crumb">Conteúdo / ' + (S.mode === "quadro" ? "Produção" : "Calendário") + '</div><h1>Calendário de <em>conteúdo</em></h1></div>' +
+      '<div class="toolbar">' + (S.filter !== "all" && client(S.filter) ? (client(S.filter).drive ? '<a class="btn" href="' + esc(client(S.filter).drive) + '" target="_blank" rel="noopener">Abrir Drive de ' + esc(client(S.filter).name) + "</a>" : '<button type="button" class="btn" data-client="' + S.filter + '">Adicionar pasta do Drive</button>') : "") + '<div class="seg"><button type="button" data-mode="quadro" aria-pressed="' + (S.mode === "quadro") + '">Quadro</button><button type="button" data-mode="calendario" aria-pressed="' + (S.mode === "calendario") + '">Calendário</button></div><button type="button" class="btn primary" data-new="post">Novo conteúdo</button></div></div>' +
+      filterBar() + body +
+      '<p class="note">Aqui fica só o planejamento de conteúdo de cada cliente. Pedidos avulsos (artes extras, informativos, impressos, campanhas, eventos) vão em <button type="button" class="btn ghost" data-go="demandas">Demandas</button>' + (S.mode === "quadro" ? " Arraste o cartão para mudar de etapa." : "") + "</p>";
+  }
+
+  function vAprovacao() {
+    const items = visPosts().filter((p) => p.status === "aprovacao").sort(byDate);
+    return '<div class="head"><div><div class="crumb">Conteúdo / Aprovação</div><h1>Aprovação do <em>cliente</em></h1><p class="lede">O que está com o cliente agora. Quando ele aprovar, abra o conteúdo e mude a etapa para Aprovado, com o retorno dele.</p></div></div>' +
+      filterBar() +
+      '<section class="panel"><ul class="list">' + (items.length ? items.map(postRow).join("") : '<li class="empty">Nada esperando aprovação.</li>') + "</ul></section>" +
+      '<p class="note">A página de aprovação que o cliente abre com o próprio login do Claude será separada desta central, uma por cliente, para ele ver só os conteúdos dele.</p>';
+  }
+
+  const num = (v) => v == null || v === "" ? "—" : (typeof v === "number" ? v.toLocaleString("pt-BR") : esc(v));
+  function fileGrid(cid, field, items) {
+    return '<div class="imgs">' + items.map((it, i) => {
+      const isImg = /^image\//.test(it.type || "") || /\.(png|jpe?g|webp|gif|svg)$/i.test(it.name || "");
+      const key = field + ":" + i;
+      return "<figure>" + (isImg ? '<img src="' + esc(it.url) + '" alt="' + esc(it.name || "") + '" loading="lazy">' : '<a class="file" href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.name || "Arquivo") + "</a>") +
+        '<button type="button" class="rm' + (S.rmPending === key ? " sure" : "") + '" data-rmimg="' + key + '" aria-label="Remover ' + esc(it.name || "") + '">' + (S.rmPending === key ? "Remover?" : "×") + "</button></figure>";
+    }).join("") + "</div>";
+  }
+  function uploadBtn(field, label) {
+    if (!assets) return "";
+    return '<label class="btn ghost" for="up-' + field + '">' + (S.uploading ? "Enviando…" : label) + '<input type="file" id="up-' + field + '" data-upload="' + field + '" accept="image/*,.pdf,.svg" multiple></label>';
+  }
+
+  function vPainel() {
+    const cid = S.pc && client(S.pc) ? S.pc : (S.filter !== "all" ? S.filter : (S.clients[0] || {}).id);
+    if (!cid) return '<h1>Painel por cliente</h1><p class="empty">Cadastre um cliente primeiro.</p>';
+    const c = client(cid), b = S.brand[cid] || {}, m = S.metrics[cid];
+    const chips = '<div class="toolbar">' + S.clients.map((x) => '<button type="button" class="chip" data-pc="' + x.id + '" aria-pressed="' + (x.id === cid) + '" style="--c:' + esc(x.color) + '"><span class="dot"></span>' + esc(x.name) + "</button>").join("") + "</div>";
+    let met;
+    if (m) {
+      const k = (label, val, delta) => '<div class="kpi"><div class="k">' + label + '</div><div class="n">' + val + "</div>" + (delta != null && delta !== "" ? '<div class="d ' + (Number(delta) >= 0 ? "up" : "down") + '">' + (Number(delta) >= 0 ? "+" : "") + num(delta) + " no período</div>" : "") + "</div>";
+      met = '<div class="kpis">' + k("Seguidores", num(m.followers), m.followersDelta) + k("Alcance", num(m.reach)) + k("Visualizações", num(m.views)) + k("Interações", num(m.interactions)) + k("Engajamento", m.engagementRate != null ? esc(m.engagementRate) + "%" : "—") + k("Visitas ao perfil", num(m.profileVisits)) + "</div>" +
+        (m.byFormat && m.byFormat.length ? '<div class="table-wrap"><table><thead><tr><th>Formato</th><th class="num">Posts</th><th class="num">Alcance médio</th><th class="num">Interações médias</th></tr></thead><tbody>' + m.byFormat.map((f) => "<tr><td>" + esc(f.format) + '</td><td class="num">' + num(f.posts) + '</td><td class="num">' + num(f.avgReach) + '</td><td class="num">' + num(f.avgInteractions) + "</td></tr>").join("") + "</tbody></table></div>" : "") +
+        (m.top && m.top.length ? '<div class="k">Melhores posts do período</div><ul class="list">' + m.top.map((p) => '<li class="row"><span class="pill">' + esc(p.format || "") + '</span><span class="t">' + esc(p.title || "") + '<div class="s">' + (p.date ? dShort(p.date) + " · " : "") + "alcance " + num(p.reach) + " · " + num(p.interactions) + " interações</div></span>" + (p.link ? '<a class="btn ghost" href="' + esc(p.link) + '" target="_blank" rel="noopener">Ver</a>' : "<span></span>") + "</li>").join("") + "</ul>" : "") +
+        (m.insight ? '<p class="note">' + esc(m.insight) + "</p>" : "") +
+        '<div class="muted" style="font-size:12px">' + esc(m.period || "") + (m.updatedAt ? " · atualizado em " + new Date(m.updatedAt).toLocaleDateString("pt-BR") : "") + " · fonte: Instagram via Supermetrics</div>";
+    } else {
+      met = '<p class="empty">Ainda sem métricas deste perfil. Peça ao Claude: “atualiza as métricas da ' + esc(c.name) + '”. Ele puxa do Instagram pelo Supermetrics e preenche aqui, com a comparação entre vídeo, carrossel e estático.</p>';
+    }
+    const colors = (b.colors || "").split(/[\s,;]+/).filter((x) => /^#?[0-9a-f]{3,8}$/i.test(x)).map((x) => x[0] === "#" ? x : "#" + x);
+    const links = (b.links || "").split("\n").map((l) => l.trim()).filter(Boolean);
+    const sec = (title, body, cls) => '<section class="panel ' + (cls || "c6") + '"><div class="ph"><h2>' + title + "</h2></div>" + body + "</section>";
+    const txt = (v, empty) => v ? '<div class="prose">' + esc(v) + "</div>" : '<p class="empty">' + empty + "</p>";
+    const month = S.posts.filter((p) => p.clientId === cid && monthOf(p.date) === thisMonth()).sort(byDate);
+    const nextM = S.posts.filter((p) => p.clientId === cid && monthOf(p.date) === addMonth(thisMonth(), 1)).sort(byDate);
+    return '<div class="head"><div><div class="crumb">Conteúdo / Painel por cliente</div><h1>' + esc(c.name) + '</h1><p class="lede">' + esc(c.niche || "") + (c.rhythm ? " · " + esc(c.rhythm) : "") + "</p></div>" +
+      '<div class="toolbar">' + (c.drive ? '<a class="btn" href="' + esc(c.drive) + '" target="_blank" rel="noopener">Abrir Drive do cliente</a>' : '<button type="button" class="btn" data-client="' + cid + '">Adicionar pasta do Drive</button>') +
+      (c.drive2 ? '<a class="btn" href="' + esc(c.drive2) + '" target="_blank" rel="noopener">Drive ' + esc(c.drive2Label || "2") + "</a>" : "") +
+      '<button type="button" class="btn primary" data-editbrand="' + cid + '">Editar guia</button></div></div>' + chips +
+      (c.drive ? "" : '<p class="note">Cadastre a pasta do Drive deste cliente para a equipe salvar lá cada demanda finalizada.</p>') +
+      '<div class="grid">' +
+      sec("Métricas do Instagram", met, "c12") +
+      sec("Linha editorial", txt(b.editorial, "Ainda não definida. Clique em Editar guia.") + (b.pillars ? '<div class="k">Pilares</div><div class="prose">' + esc(b.pillars) + "</div>" : ""), "c7") +
+      sec("Tom e público", (b.tone ? '<div><div class="k">Tom de voz</div><div class="prose">' + esc(b.tone) + "</div></div>" : "") + (b.audience ? '<div><div class="k">Público</div><div class="prose">' + esc(b.audience) + "</div></div>" : "") + (c.rhythm ? '<div><div class="k">Ritmo</div><div class="prose">' + esc(c.rhythm) + "</div></div>" : "") + (!b.tone && !b.audience && !c.rhythm ? '<p class="empty">Sem tom de voz e público definidos.</p>' : ""), "c5") +
+      '<section class="panel c12"><div class="ph"><h2>Identidade visual</h2>' + uploadBtn("logos", "Enviar logo") + "</div>" +
+        '<div class="grid"><div class="c6" style="display:grid;gap:8px;align-content:start"><div class="k">Cores</div>' + (colors.length ? '<div class="swatches">' + colors.map((h) => '<button type="button" class="sw" data-copy="' + esc(h) + '" style="--c:' + esc(h) + '" title="Copiar código"><i></i>' + esc(h.toUpperCase()) + "</button>").join("") + "</div>" : '<p class="empty">Sem cores cadastradas.</p>') +
+        '<div class="k">Fontes</div>' + txt(b.fonts, "Sem fontes cadastradas.") + "</div>" +
+        '<div class="c6" style="display:grid;gap:8px;align-content:start"><div class="k">Logos</div>' + ((b.logos || []).length ? fileGrid(cid, "logos", b.logos) : '<p class="empty">Nenhuma logo enviada.</p>') + "</div></div></section>" +
+      '<section class="panel c12"><div class="ph"><h2>Referências visuais</h2>' + uploadBtn("moodboard", "Enviar referências") + "</div>" + ((b.moodboard || []).length ? fileGrid(cid, "moodboard", b.moodboard) : '<p class="empty">Suba prints de posts, carrosséis e feeds que servem de referência para este cliente.</p>') + "</section>" +
+      sec("Links de referência", links.length ? '<ul class="list links">' + links.map((l) => { const mm = l.match(/(https?:\/\/\S+)\s*[—–-]?\s*(.*)/); return '<li class="row" style="grid-template-columns:1fr">' + (mm ? '<span><a href="' + esc(mm[1]) + '" target="_blank" rel="noopener">' + esc(mm[1]) + "</a>" + (mm[2] ? '<div class="s">' + esc(mm[2]) + "</div>" : "") + "</span>" : "<span>" + esc(l) + "</span>") + "</li>"; }).join("") + "</ul>" : '<p class="empty">Nenhum link ainda.</p>', "c6") +
+      sec("Fazer e evitar", (b.dos ? '<div><div class="k">Fazer</div><div class="prose">' + esc(b.dos) + "</div></div>" : "") + (b.donts ? '<div><div class="k">Evitar</div><div class="prose">' + esc(b.donts) + "</div></div>" : "") + (!b.dos && !b.donts ? '<p class="empty">Nada registrado.</p>' : ""), "c6") +
+      sec("Conteúdos de " + esc(MES[new Date().getMonth()]), '<ul class="list">' + (month.length ? month.map(postRow).join("") : '<li class="empty">Nenhum conteúdo neste mês.</li>') + "</ul>", "c6") +
+      sec("Conteúdos de " + esc(MES[(new Date().getMonth() + 1) % 12]), '<ul class="list">' + (nextM.length ? nextM.map(postRow).join("") : '<li class="empty">Nenhum conteúdo planejado ainda.</li>') + "</ul>", "c6") +
+      (() => { const ds = S.demandas.filter((x) => x.clientId === cid && x.status !== "feito").sort((a, b) => byDate({ date: a.due }, { date: b.due }));
+        return '<section class="panel c12"><div class="ph"><h2>Demandas em aberto</h2><button type="button" class="btn ghost" data-newdemc="' + cid + '">Nova demanda</button></div><ul class="list">' + (ds.length ? ds.map(demListRow).join("") : '<li class="empty">Nenhuma demanda avulsa em aberto.</li>') + "</ul></section>"; })() +
+      "</div>";
+  }
+
+  const laneItems = (m, lane) => lane.items.filter((it) => !it[4] || it[4] === m.gravacao);
+  const isDone = (m, k) => !!(m.checks || {})[k];
+  const laneDone = (m, lane) => laneItems(m, lane).every(([k]) => isDone(m, k)) && !(lane.id === "le" && !m.gravacao);
+  const curLane = (m) => IMPL.find((l) => !laneDone(m, l)) || null;
+  const pct = (a, b) => b ? Math.round((a / b) * 100) : 0;
+  function implPct(m) { const all = IMPL.flatMap((l) => laneItems(m, l)); return pct(all.filter(([k]) => isDone(m, k)).length, all.length); }
+  const rkey = (mm, k) => "rot:" + mm + ":" + k;
+  function rotPct(m, mm, group) { const its = group.items; return pct(its.filter(([k]) => isDone(m, rkey(mm, k))).length, its.length); }
+  const roleTag = (r, tag) => '<span class="role">' + esc(r || "") + (tag ? " · " + esc(tag) : "") + "</span>";
+  const medStName = (s) => (MED_ST.find((x) => x[0] === s) || [, s || ""])[1];
+  function checkRow(m, key, label, role, tag) {
+    return '<li><label class="' + (isDone(m, key) ? "done" : "") + '"><input type="checkbox" data-mck="' + esc(key) + '" data-mid="' + m.id + '"' + (isDone(m, key) ? " checked" : "") + '><span class="lbl">' + esc(label) + "</span>" + roleTag(role, tag) + "</label></li>";
+  }
+
+  function editMed(m) {
+    m = m || { status: "prospeccao", package: "Estratégia" };
+    openDrawer(m.id ? m.name : "Novo médico", [
+      { id: "name", label: "Nome", required: true, ph: "Dr(a). …" },
+      { type: "row", fields: [{ id: "specialty", label: "Especialidade" }, { id: "city", label: "Cidade" }] },
+      { type: "row", fields: [{ id: "status", label: "Fase", type: "select", options: MED_ST }, { id: "package", label: "Pacote", type: "select", options: ["Estratégia", "Estratégia + Aceleração"] }] },
+      { type: "row", fields: [{ id: "instagram", label: "Instagram", ph: "@perfil" }, { id: "start", label: "Início do contrato", type: "date" }] },
+      { id: "contact", label: "Contato (secretária, WhatsApp)" },
+      { id: "drive", label: "Pasta do Drive", type: "url", ph: "https://drive.google.com/…" },
+      { id: "nextStep", label: "Próximo passo comercial", ph: "Ex.: enviar proposta até sexta" },
+      { id: "notes", label: "Diagnóstico e observações", type: "textarea" },
+    ], m, async (v) => { const data = Object.assign({}, m, v); delete data.id; if (!m.id) { data.created = new Date().toISOString(); data.checks = {}; } return save("medicos", m.id, data); },
+    m.id ? () => { S.med = null; return del("medicos", m.id); } : null);
+  }
+
+  function medCard(x, extra) {
+    return '<button type="button" class="card" data-med="' + x.id + '"><span class="ct">' + esc(x.name) + '</span><span class="cm">' + esc([x.specialty, x.city, x.package].filter(Boolean).join(" · ")) + "</span>" + (extra || "") + "</button>";
+  }
+
+  function vMedico() {
+    const sel = S.medicos.find((x) => x.id === S.med);
+    if (sel) return vMedDetail(sel);
+    const tab = S.medTab || "implantacao";
+    const tabs = [["funil", "Funil comercial"], ["implantacao", "Implantação"], ["rotina", "Rotina do mês"], ["funcoes", "Tarefas por função"], ["metodo", "Pilares do método"]];
+    let body = "";
+    const active = S.medicos.filter((x) => x.status === "implantacao" || x.status === "operacao");
+    if (tab === "funil") {
+      body = '<div class="kanban-wrap"><div class="kanban">' + [["prospeccao", "Prospecção"], ["proposta", "Proposta enviada"], ["perdido", "Não fechou"]].map(([k, l]) => {
+        const items = S.medicos.filter((x) => (x.status || "prospeccao") === k);
+        return '<section class="col"><div class="ch"><span>' + l + '</span><span class="pill">' + items.length + "</span></div>" + items.map((x) => medCard(x, x.nextStep ? '<span class="cm">→ ' + esc(x.nextStep) + "</span>" : "")).join("") + "</section>";
+      }).join("") + "</div></div>" + '<p class="note">Quando o médico fechar, abra a ficha e clique em “Fechou contrato”. Ele entra na Implantação, começando pelo pré-onboarding.</p>';
+    } else if (tab === "implantacao") {
+      const imp = S.medicos.filter((x) => x.status === "implantacao");
+      body = '<div class="kanban-wrap"><div class="kanban">' + IMPL.concat([{ id: "_ok", title: "Pronto para a rotina" }]).map((lane) => {
+        const items = imp.filter((x) => { const c = curLane(x); return lane.id === "_ok" ? !c : c && c.id === lane.id; });
+        return '<section class="col"><div class="ch"><span>' + esc(lane.title) + '</span><span class="pill">' + items.length + "</span></div>" + items.map((x) => {
+          if (lane.id === "_ok") return medCard(x, '<span class="cm">Implantação concluída. Abra e inicie a rotina.</span>');
+          const its = laneItems(x, lane); const done = its.filter(([k]) => isDone(x, k)).length; const nxt = its.find(([k]) => !isDone(x, k));
+          return medCard(x, '<div class="prog" style="--p:' + pct(done, its.length) + '%"><i></i></div><span class="cm">' + done + "/" + its.length + " nesta etapa</span>" +
+            (nxt ? '<span class="cm">Próximo: ' + esc(nxt[1]) + " · " + esc(nxt[2]) + "</span>" : lane.id === "le" && !x.gravacao ? '<span class="cm">Definir: gravação in loco?</span>' : ""));
+        }).join("") + "</section>";
+      }).join("") + "</div></div>";
+    } else if (tab === "rotina") {
+      const ops = S.medicos.filter((x) => x.status === "operacao");
+      body = '<div class="toolbar"><button type="button" class="btn" data-medm="-1" aria-label="Mês anterior">←</button><h2 style="text-transform:capitalize">' + esc(monthLabel(S.medMonth)) + '</h2><button type="button" class="btn" data-medm="1" aria-label="Próximo mês">→</button></div>' +
+        '<section class="panel"><div class="table-wrap"><table><thead><tr><th>Médico</th>' + ROUT.map((g) => "<th>" + esc(g.title) + "</th>").join("") + "</tr></thead><tbody>" +
+        (ops.length ? ops.map((x) => '<tr class="click" data-med="' + x.id + '"><td><b>' + esc(x.name) + '</b><div class="muted" style="font-size:12px">' + esc(x.specialty || "") + "</div></td>" +
+          ROUT.map((g) => { const p = rotPct(x, S.medMonth, g); return '<td style="min-width:140px"><div class="prog" style="--p:' + p + '%"><i></i></div><div class="muted" style="font-size:12px">' + p + "%</div></td>"; }).join("") + "</tr>").join("")
+          : '<tr><td colspan="4" class="empty">Nenhum médico em operação ainda.</td></tr>') + "</tbody></table></div></section>";
+    } else if (tab === "funcoes") {
+      const role = S.medRole || "Estrategista";
+      const rows = [];
+      for (const x of active) {
+        if (x.status === "implantacao") {
+          const c = curLane(x); if (!c) continue;
+          for (const it of laneItems(x, c)) if (it[2] === role && !isDone(x, it[0])) rows.push([x, it[0], it[1], c.title, it[3]]);
+          if (c.id === "le" && !x.gravacao && role === "Estrategista") rows.push([x, null, "Definir com o médico: gravação in loco?", c.title, ""]);
+        } else {
+          for (const g of ROUT) for (const it of g.items) if (it[2] === role && !isDone(x, rkey(S.medMonth, it[0]))) rows.push([x, rkey(S.medMonth, it[0]), it[1], g.title + " · " + monthLabel(S.medMonth), it[3]]);
+        }
+      }
+      body = '<div class="toolbar">' + MED_ROLES.map((r) => '<button type="button" class="chip" data-medrole="' + esc(r) + '" aria-pressed="' + (r === role) + '">' + esc(r) + "</button>").join("") + "</div>" +
+        '<section class="panel"><ul class="checks">' + (rows.length ? rows.map(([x, key, label, stage, tag]) => key
+          ? '<li><label><input type="checkbox" data-mck="' + esc(key) + '" data-mid="' + x.id + '"><span class="lbl"><b>' + esc(x.name) + "</b> · " + esc(label) + "</span>" + roleTag(stage, tag) + "</label></li>"
+          : '<li><button type="button" class="row" data-med="' + x.id + '" style="grid-template-columns:1fr auto"><span class="t">' + esc(x.name) + " · " + esc(label) + '</span><span class="pill warn">decidir</span></button></li>').join("")
+          : '<li class="empty">Nenhuma tarefa pendente para ' + esc(role) + ".</li>") + "</ul></section>" +
+        '<p class="note">Mostra só o que está liberado agora: na implantação, as tarefas da etapa atual de cada médico; em operação, a rotina do mês selecionado na aba Rotina do mês.</p>';
+    } else {
+      body = '<div class="pillars">' + PILLARS.map((ph) => '<div class="panel pillar"><div class="pn">' + ph.n + "</div><h3>" + esc(ph.title) + "</h3><p>" + esc(ph.sub) + '</p><ul class="checks">' + ph.items.map(([, l]) => '<li class="muted" style="font-size:12.5px">' + esc(l) + "</li>").join("") + "</ul></div>").join("") + "</div>" +
+        (active.length ? '<section class="panel"><div class="ph"><h2>Prioridade por médico</h2><span class="k">definida no diagnóstico</span></div><div class="table-wrap"><table><thead><tr><th>Médico</th>' + PILLARS.map((p) => "<th>" + p.n + " " + esc(p.title) + "</th>").join("") + "</tr></thead><tbody>" +
+          active.map((x) => '<tr class="click" data-med="' + x.id + '"><td><b>' + esc(x.name) + "</b></td>" + PILLARS.map((p) => { const pr = (x.prio || {})[p.id]; return "<td>" + (pr ? '<span class="pill ' + ({ alta: "bad", media: "warn", baixa: "acc", fora: "" }[pr] || "") + '">' + esc({ alta: "Alta", media: "Média", baixa: "Baixa", fora: "Fora" }[pr] || pr) + "</span>" : '<span class="muted">—</span>') + "</td>"; }).join("") + "</tr>").join("") +
+          "</tbody></table></div></section>" : "");
+    }
+    return '<div class="head"><div><div class="crumb">Método iMed / Marketing médico</div><h1>Marketing <em>médico</em></h1><p class="lede">Gestão dos médicos pelo processo da Nexo: funil comercial, implantação em 6 etapas, rotina mensal e os 5 pilares do Método iMed.</p></div>' +
+      '<div class="toolbar"><button type="button" class="btn primary" data-new="med">Novo médico</button></div></div>' +
+      '<div class="seg" role="tablist">' + tabs.map(([k, l]) => '<button type="button" data-medtab="' + k + '" aria-pressed="' + (tab === k) + '">' + l + "</button>").join("") + "</div>" + body;
+  }
+
+  function vMedDetail(m) {
+    const prio = m.prio || {};
+    const mm = S.medMonth;
+    const cl = curLane(m);
+    const lanePanel = (lane) => {
+      const its = laneItems(m, lane); const done = its.filter(([k]) => isDone(m, k)).length;
+      const state = laneDone(m, lane) ? '<span class="pill ok">concluída</span>' : cl && cl.id === lane.id ? '<span class="pill acc">etapa atual</span>' : '<span class="k">' + done + "/" + its.length + "</span>";
+      const decision = lane.id === "le" ? '<div class="field"><label for="grav-' + m.id + '">Gravação in loco?</label><select id="grav-' + m.id + '" data-grav="' + m.id + '"><option value="">Definir com o médico</option><option value="sim"' + (m.gravacao === "sim" ? " selected" : "") + '>Sim · videomaker grava com o médico</option><option value="nao"' + (m.gravacao === "nao" ? " selected" : "") + ">Não · o médico envia a 1ª leva</option></select></div>" : "";
+      return '<section class="panel phase c6"><div class="ph"><h2>' + esc(lane.title) + "</h2>" + state + '</div><p class="muted" style="margin:0">' + esc(lane.sub) + '</p><div class="prog" style="--p:' + pct(done, its.length) + '%"><i></i></div>' + decision +
+        '<ul class="checks">' + its.map(([k, l, r, t]) => checkRow(m, k, l, r, t)).join("") + "</ul></section>";
+    };
+    const rotPanel = (g) => '<section class="panel phase c4"><div class="ph"><h2>' + esc(g.title) + '</h2><span class="k">' + rotPct(m, mm, g) + '%</span></div><ul class="checks">' + g.items.map(([k, l, r, t]) => checkRow(m, rkey(mm, k), l, r, t)).join("") + "</ul></section>";
+    const pillarPanel = (ph) => '<section class="panel phase c6"><div class="ph"><h2><span class="pn">' + ph.n + "</span>" + esc(ph.title) + '</h2><select class="prio" data-prio="' + ph.id + '" aria-label="Prioridade de ' + esc(ph.title) + '">' +
+      [["", "Prioridade"], ["alta", "Alta"], ["media", "Média"], ["baixa", "Baixa"], ["fora", "Fora do escopo"]].map(([v, l]) => '<option value="' + v + '"' + ((prio[ph.id] || "") === v ? " selected" : "") + ">" + l + "</option>").join("") + '</select></div><p class="muted" style="margin:0">' + esc(ph.sub) + '</p><ul class="checks">' + ph.items.map(([k, l]) => checkRow(m, k, l, "Entrega", "")).join("") + "</ul></section>";
+    let action = "";
+    if (m.status === "prospeccao" || m.status === "proposta") action = '<button type="button" class="btn primary" data-medstatus="implantacao">Fechou contrato</button>';
+    else if (m.status === "implantacao" && !cl) action = '<button type="button" class="btn primary" data-medstatus="operacao">Iniciar rotina mensal</button>';
+    const inClients = !!client(m.id);
+    const sections = [];
+    if (m.status !== "prospeccao" && m.status !== "proposta" && m.status !== "perdido") {
+      sections.push('<div class="c12 ph"><h2>Implantação</h2><span class="k">' + implPct(m) + "% concluída</span></div>" + IMPL.map(lanePanel).join(""));
+      if (m.status === "operacao" || m.status === "pausado") sections.push('<div class="c12 ph"><h2>Rotina de ' + esc(monthLabel(mm)) + '</h2><div class="toolbar"><button type="button" class="btn" data-medm="-1" aria-label="Mês anterior">←</button><button type="button" class="btn" data-medm="1" aria-label="Próximo mês">→</button></div></div>' + ROUT.map(rotPanel).join(""));
+      sections.push('<div class="c12 ph"><h2>Pilares do Método iMed</h2><span class="k">prioridade e entregas</span></div>' + PILLARS.map(pillarPanel).join(""));
+    }
+    return '<div class="head"><div><div class="crumb"><button type="button" class="btn ghost" data-med="">← Marketing médico</button></div><h1>' + esc(m.name) + '</h1><p class="lede">' + esc([m.specialty, m.city, m.package, medStName(m.status)].filter(Boolean).join(" · ")) + "</p></div>" +
+      '<div class="toolbar">' + action + (m.drive ? '<a class="btn" href="' + esc(m.drive) + '" target="_blank" rel="noopener">Abrir Drive</a>' : "") +
+      (m.status === "operacao" ? (inClients ? '<button type="button" class="btn" data-pcgo="' + m.id + '">Calendário e métricas</button>' : '<button type="button" class="btn" data-medclient="' + m.id + '">Criar calendário de conteúdo</button>') : "") +
+      '<button type="button" class="btn" data-editmed="' + m.id + '">Editar</button></div></div>' +
+      '<div class="grid"><section class="panel dark c4"><div class="k">' + (m.status === "implantacao" ? "Etapa atual" : "Fase") + '</div><div class="big" style="font-size:30px">' + esc(m.status === "implantacao" ? (cl ? cl.title : "Pronto para a rotina") : medStName(m.status)) + '</div><div class="muted">' + (m.nextStep ? "Próximo passo: " + esc(m.nextStep) : "") + "</div></section>" +
+      '<section class="panel c8"><div class="k">Diagnóstico e observações</div>' + (m.notes ? '<div class="prose">' + esc(m.notes) + "</div>" : '<p class="empty">Registre aqui o diagnóstico da Reunião #00.</p>') + (m.contact ? '<div class="muted">Contato: ' + esc(m.contact) + "</div>" : "") + "</section>" +
+      sections.join("") + "</div>";
+  }
+  // ---------- equipe e matriz ----------
+  function medPendingFor(roles) {
+    const rows = [];
+    for (const x of S.medicos.filter((y) => y.status === "implantacao" || y.status === "operacao")) {
+      if (x.status === "implantacao") {
+        const c = curLane(x); if (!c) continue;
+        for (const it of laneItems(x, c)) if (roles.includes(it[2]) && !isDone(x, it[0])) rows.push([x, it[0], it[1], c.title, it[3]]);
+      } else {
+        for (const g of ROUT) for (const it of g.items) if (roles.includes(it[2]) && !isDone(x, rkey(thisMonth(), it[0]))) rows.push([x, rkey(thisMonth(), it[0]), it[1], g.title, it[3]]);
+      }
+    }
+    return rows;
+  }
+  const openDem = (name) => S.demandas.filter((d) => d.assignee === name && d.status !== "feito");
+  const openPosts = (name) => S.posts.filter((p) => p.owner === name && !["agendado", "publicado"].includes(p.status));
+  const teamCount = (t) => openDem(t.name).length + openPosts(t.name).length + medPendingFor(t.roles).length;
+
+  function editDemanda(d, preset) {
+    d = d || Object.assign({ status: "afazer", kind: "Arte avulsa", assignee: S.view === "equipe" && S.person ? S.person : "Luiza", clientId: S.filter !== "all" ? S.filter : "" }, preset || {});
+    openDrawer(d.id ? "Demanda" : "Nova demanda", [
+      { id: "title", label: "O que precisa ser feito", required: true },
+      { type: "row", fields: [{ id: "clientId", label: "Cliente", type: "select", options: [["", "Interno / nenhum"]].concat(clientOpts()) }, { id: "kind", label: "Tipo", type: "select", options: DEM_KIND }] },
+      { type: "row", fields: [{ id: "assignee", label: "Responsável", type: "select", options: TEAM.map((t) => t.name) }, { id: "status", label: "Situação", type: "select", options: DEM_ST }] },
+      { type: "row", fields: [{ id: "requestedBy", label: "Quem pediu", ph: "Ex.: Naylla" }, { id: "due", label: "Prazo", type: "date" }] },
+      { id: "notes", label: "Briefing", type: "textarea", ph: "O que entregar, formato, referências" },
+      { id: "link", label: "Link da entrega no Drive", type: "url", ph: "https://" },
+    ], d, async (v) => {
+      const data = Object.assign({}, d, v); delete data.id;
+      if (!d.id) data.created = new Date().toISOString();
+      if (v.status === "feito" && d.status !== "feito") data.doneAt = new Date().toISOString();
+      return save("demandas", d.id || uid("d"), data);
+    }, d.id ? () => del("demandas", d.id) : null);
+  }
+
+  const demStName = (s) => (DEM_ST.find((x) => x[0] === s) || [, s || ""])[1];
+  function demListRow(d) {
+    const cls = { afazer: "warn", fazendo: "acc", aprovacao: "bad", feito: "ok" }[d.status] || "";
+    return '<li><button type="button" class="row" data-dem="' + d.id + '" style="--c:' + esc(d.clientId ? ccolor(d.clientId) : "var(--muted)") + '"><span class="dot"></span><span class="t">' + esc(d.title) +
+      '<div class="s">' + esc([d.clientId ? cname(d.clientId) : "Interno", d.kind, d.assignee, d.due ? "prazo " + dShort(d.due) : ""].filter(Boolean).join(" · ")) + '</div></span><span class="pill ' + cls + '">' + esc(demStName(d.status)) + "</span></button></li>";
+  }
+
+  function vDemandas() {
+    const who = S.demWho || "all";
+    const list = S.demandas.filter((d) => (S.filter === "all" || d.clientId === S.filter) && (who === "all" || d.assignee === who));
+    const recentDone = (d) => d.status !== "feito" || !d.doneAt || Date.now() - new Date(d.doneAt) < 14 * 864e5;
+    const board = '<div class="kanban-wrap"><div class="kanban">' + DEM_ST.map(([k, l]) => {
+      const items = list.filter((d) => (d.status || "afazer") === k && recentDone(d)).sort((a, b) => byDate({ date: a.due }, { date: b.due }));
+      return '<section class="col" data-dcol="' + k + '"><div class="ch"><span>' + esc(l) + '</span><span class="pill">' + items.length + "</span></div>" +
+        items.map((d) => '<button type="button" class="card" draggable="true" data-dem="' + d.id + '" style="--c:' + esc(d.clientId ? ccolor(d.clientId) : "var(--muted)") + '"><span class="cl"><span class="dot"></span>' + esc(d.clientId ? cname(d.clientId) : "Interno") + '</span><span class="ct">' + esc(d.title) + '</span><span class="cm"><span class="pill">' + esc(d.kind || "Outro") + "</span>" + (d.status !== "feito" ? dueChip(d.due) : "") + "<span>· " + esc(d.assignee || "") + "</span>" + (d.link ? '<span class="pill ok">no Drive</span>' : "") + "</span>" + (d.requestedBy ? '<span class="cm">pedido por ' + esc(d.requestedBy) + "</span>" : "") + "</button>").join("") +
+        "</section>";
+    }).join("") + "</div></div>";
+    return '<div class="head"><div><div class="crumb">Operação / Demandas</div><h1>Demandas</h1><p class="lede">Pedidos avulsos dos clientes e demandas internas: artes extras, informativos, impressos, campanhas, eventos, ajustes. O planejamento mensal fica no Calendário de conteúdo.</p></div>' +
+      '<div class="toolbar"><div class="seg">' + [["all", "Todos"]].concat(TEAM.map((t) => [t.name, t.name])).map(([v, l]) => '<button type="button" data-demwho="' + esc(v) + '" aria-pressed="' + (who === v) + '">' + esc(l) + "</button>").join("") + '</div><button type="button" class="btn primary" data-new="dem">Nova demanda</button></div></div>' +
+      filterBar() + board + '<p class="note">Arraste o cartão para mudar a situação. Concluídas ficam visíveis por 14 dias. Ao terminar, cole o link da entrega no Drive dentro da demanda.</p>';
+  }
+
+  function delegate(t) {
+    openDrawer("Delegar tarefa", [
+      { id: "title", label: "Tarefa", required: true },
+      { type: "row", fields: [{ id: "assignee", label: "Para", type: "select", options: TEAM.filter((x) => x.name !== "Luiza").map((x) => x.name) }, { id: "due", label: "Prazo", type: "date" }] },
+      { id: "clientId", label: "Cliente", type: "select", options: [["", "Interno / nenhum"]].concat(clientOpts()) },
+      { id: "notes", label: "Briefing para a equipe", type: "textarea" },
+    ], { title: t.title, assignee: t.delegateTo || "Vitor", due: t.due || "", notes: t.note || "", clientId: "" }, async (v) => {
+      const id = t.demandaId || uid("d");
+      const ok = await save("demandas", id, { title: v.title, assignee: v.assignee, due: v.due, clientId: v.clientId, notes: v.notes, status: "afazer", fromMatrix: t.id, created: new Date().toISOString() });
+      if (ok) await patch("matriz", t.id, { q: 3, delegateTo: v.assignee, demandaId: id });
+      return ok;
+    });
+  }
+
+  function editTask(t) {
+    t = t || { q: 2 };
+    openDrawer(t.id ? "Tarefa" : "Nova tarefa", [
+      { id: "title", label: "Tarefa", required: true },
+      { type: "row", fields: [{ id: "q", label: "Quadrante", type: "select", options: [1, 2, 3, 4].map((q) => [q, q + " · " + QN[q][1]]) }, { id: "due", label: "Prazo", type: "date" }] },
+      { id: "note", label: "Observação", type: "textarea" },
+    ], t, async (v) => { const data = Object.assign({}, t, v, { q: Number(v.q) }); delete data.id; if (!t.id) { data.created = new Date().toISOString(); data.done = false; } return save("matriz", t.id || uid("m"), data); },
+    t.id ? () => del("matriz", t.id) : null);
+  }
+
+  function dueChip(due) {
+    if (!due) return "";
+    const diff = Math.round((new Date(due + "T12:00") - new Date(today() + "T12:00")) / 864e5);
+    return '<span class="pill ' + (diff < 0 ? "bad" : diff === 0 ? "warn" : "") + '">' + (diff < 0 ? "atrasada · " + dShort(due) : diff === 0 ? "hoje" : diff === 1 ? "amanhã" : dShort(due)) + "</span>";
+  }
+
+  function taskRow(t) {
+    const dem = t.demandaId ? S.demandas.find((d) => d.id === t.demandaId) : null;
+    const sure = S.mxDel === t.id;
+    return '<li class="task' + (t.done ? " done" : "") + '"><input type="checkbox" data-mxdone="' + t.id + '"' + (t.done ? " checked" : "") + ' aria-label="Concluir ' + esc(t.title) + '">' +
+      '<div><button type="button" class="tt" data-mxedit="' + t.id + '" style="border:0;background:none;padding:0;text-align:left;font:inherit;color:inherit;font-weight:inherit;cursor:pointer">' + esc(t.title) + '</button><div class="tm">' + (t.done ? "" : dueChip(t.due)) +
+      (t.delegateTo ? '<span class="pill acc">→ ' + esc(t.delegateTo) + (dem ? " · " + esc((DEM_ST.find((s) => s[0] === dem.status) || [, ""])[1]).toLowerCase() : "") + "</span>" : "") +
+      (t.note ? "<span>" + esc(t.note) + "</span>" : "") + (t.done && t.doneAt ? "<span>feita em " + new Date(t.doneAt).toLocaleDateString("pt-BR") + "</span>" : "") + "</div></div>" +
+      '<div class="ta">' + (t.done ? "" : '<select data-mxq="' + t.id + '" aria-label="Mudar quadrante">' + [1, 2, 3, 4].map((q) => '<option value="' + q + '"' + (q === t.q ? " selected" : "") + ">" + q + "</option>").join("") + "</select>" +
+      (t.demandaId ? "" : '<button type="button" data-mxdeleg="' + t.id + '">Delegar</button>')) +
+      '<button type="button" data-mxdel="' + t.id + '"' + (sure ? ' class="sure"' : "") + ' aria-label="Apagar">' + (sure ? "Apagar?" : "×") + "</button></div></li>";
+  }
+
+  function vMatriz() {
+    if (!S.owner) return '<h1>Minha matriz</h1><p class="lede">Esta área é pessoal da dona da central.</p>';
+    const open = (q) => S.matriz.filter((t) => t.q === q && !t.done).sort((a, b) => (a.due || "9999") < (b.due || "9999") ? -1 : (a.due || "9999") > (b.due || "9999") ? 1 : (a.created || "") < (b.created || "") ? -1 : 1);
+    const done = S.matriz.filter((t) => t.done).sort((a, b) => (b.doneAt || "") > (a.doneAt || "") ? 1 : -1);
+    return '<div class="head"><div><div class="crumb">Geral / Minha matriz · só você</div><h1>Matriz de <em>Eisenhower</em></h1><p class="lede">Seu controle pessoal. Mande tarefas para o Claude por texto ou áudio, ou adicione aqui. Ao delegar, a tarefa aparece na aba da pessoa em Equipe.</p></div></div>' +
+      '<form class="quick" id="mx-add"><input type="text" id="mx-title" placeholder="Nova tarefa…" aria-label="Nova tarefa" autocomplete="off"><select id="mx-q" aria-label="Quadrante">' + [1, 2, 3, 4].map((q) => '<option value="' + q + '"' + (q === 2 ? " selected" : "") + ">" + q + " · " + QN[q][1] + "</option>").join("") + '</select><input type="date" id="mx-due" aria-label="Prazo"><button type="submit" class="btn primary">Adicionar</button></form>' +
+      '<div class="mx">' + [1, 2, 3, 4].map((q) => { const items = open(q); return '<section class="panel mxq mq' + q + '"><div class="ph"><div><div class="qk">' + QN[q][0] + "</div><h2>" + QN[q][1] + '</h2></div><span class="k">' + items.length + '</span></div><ul class="list">' + (items.length ? items.map(taskRow).join("") : '<li class="empty">' + (q === 1 ? "Nada pegando fogo." : "Vazio.") + "</li>") + "</ul></section>"; }).join("") + "</div>" +
+      (done.length ? '<section class="panel"><details><summary class="k" style="cursor:pointer">Concluídas · ' + done.length + '</summary><ul class="list">' + done.slice(0, 60).map(taskRow).join("") + "</ul></details></section>" : "");
+  }
+
+  function vEquipe() {
+    const person = TEAM.find((t) => t.name === S.person) || TEAM[0];
+    const dem = S.demandas.filter((d) => d.assignee === person.name).sort((a, b) => (a.status === "feito") - (b.status === "feito") || byDate({ date: a.due }, { date: b.due }));
+    const openD = dem.filter((d) => d.status !== "feito"), doneD = dem.filter((d) => d.status === "feito").slice(0, 15);
+    const posts = openPosts(person.name).sort(byDate);
+    const med = medPendingFor(person.roles);
+    const demRow = (d) => '<li class="task' + (d.status === "feito" ? " done" : "") + '"><input type="checkbox" data-demdone="' + d.id + '"' + (d.status === "feito" ? " checked" : "") + ' aria-label="Concluir ' + esc(d.title) + '">' +
+      '<div><button type="button" class="tt" data-dem="' + d.id + '" style="border:0;background:none;padding:0;text-align:left;font:inherit;color:inherit;font-weight:inherit;cursor:pointer">' + esc(d.title) + '</button><div class="tm">' + (d.status === "feito" ? "" : dueChip(d.due)) + (d.clientId ? "<span>" + esc(cname(d.clientId)) + "</span>" : "") + (d.notes ? "<span>" + esc(d.notes) + "</span>" : "") + (d.link ? '<a href="' + esc(d.link) + '" target="_blank" rel="noopener" class="pill ok" style="text-decoration:none">no Drive</a>' : "") + "</div></div>" +
+      '<div class="ta">' + (d.status === "feito" ? "" : '<select data-demst="' + d.id + '" aria-label="Situação">' + DEM_ST.map(([v, l]) => '<option value="' + v + '"' + (d.status === v ? " selected" : "") + ">" + l + "</option>").join("") + "</select>") + "</div></li>";
+    return '<div class="head"><div><div class="crumb">Geral / Equipe</div><h1>Pendências da <em>equipe</em></h1><p class="lede">Tudo o que está com cada pessoa: demandas delegadas, conteúdos sob responsabilidade e tarefas do processo dos médicos.</p></div>' +
+      '<div class="toolbar"><button type="button" class="btn primary" data-new="dem">Nova demanda</button></div></div>' +
+      '<div class="toolbar">' + TEAM.map((t) => '<button type="button" class="chip" data-person="' + t.name + '" aria-pressed="' + (t.name === person.name) + '">' + t.name + ' <span class="pill">' + teamCount(t) + "</span></button>").join("") + "</div>" +
+      '<div class="grid"><section class="panel dark c4"><div class="k">' + esc(person.what) + '</div><div class="big">' + (openD.length + posts.length + med.length) + '</div><div class="muted">pendências abertas</div></section>' +
+      '<section class="panel c8"><div class="ph"><h2>Demandas</h2><span class="k">' + openD.length + ' abertas</span></div><ul class="list">' + (openD.length ? openD.map(demRow).join("") : '<li class="empty">Nenhuma demanda aberta.</li>') + "</ul>" +
+      (doneD.length ? '<details><summary class="k" style="cursor:pointer">Feitas recentemente · ' + doneD.length + '</summary><ul class="list">' + doneD.map(demRow).join("") + "</ul></details>" : "") + "</section>" +
+      '<section class="panel c6"><div class="ph"><h2>Conteúdos com ' + esc(person.name) + '</h2><span class="k">' + posts.length + '</span></div><ul class="list">' + (posts.length ? posts.map(postRow).join("") : '<li class="empty">Nenhum conteúdo sob responsabilidade.</li>') + "</ul></section>" +
+      '<section class="panel c6"><div class="ph"><h2>Processo dos médicos</h2><span class="k">' + esc(person.roles.join(", ")) + '</span></div><ul class="checks">' + (med.length ? med.map(([x, key, label, stage, tag]) => '<li><label><input type="checkbox" data-mck="' + esc(key) + '" data-mid="' + x.id + '"><span class="lbl"><b>' + esc(x.name) + "</b> · " + esc(label) + "</span>" + roleTag(stage, tag) + "</label></li>").join("") : '<li class="empty">Nada liberado agora.</li>') + "</ul></section></div>" +
+      '<p class="note">Cada pessoa abre esta aba e escolhe o próprio nome. Ao terminar, marca a caixa e cola o link da entrega no Drive.</p>';
+  }
+
+  function vClientes() {
+    return '<div class="head"><div><div class="crumb">Operação / Clientes</div><h1>Clientes</h1><p class="lede">O contexto de cada negócio. É daqui que o Claude parte para escrever pautas e referências.</p></div>' +
+      '<div class="toolbar"><button type="button" class="btn primary" data-new="client">Novo cliente</button></div></div>' +
+      '<div class="clients">' + (S.clients.length ? S.clients.map((c) => {
+        const m = thisMonth();
+        const n = S.posts.filter((p) => p.clientId === c.id && monthOf(p.date) === m).length;
+        const tr = S.traffic.filter((x) => x.clientId === c.id && x.status !== "feito").length;
+        return '<section class="panel client" style="--c:' + esc(c.color) + '"><div class="k">' + esc(c.niche || "") + '</div><div class="name">' + esc(c.name) + "</div>" +
+          '<div class="toolbar">' + (c.drive ? '<a class="btn primary" href="' + esc(c.drive) + '" target="_blank" rel="noopener">Abrir Drive' + (c.drive2 ? " " + esc(c.name.split(" ")[0]) : "") + "</a>" : '<button type="button" class="btn" data-client="' + c.id + '">Adicionar Drive</button>') +
+          (c.drive2 ? '<a class="btn" href="' + esc(c.drive2) + '" target="_blank" rel="noopener">Drive ' + esc(c.drive2Label || "2") + "</a>" : "") +
+          '<button type="button" class="btn ghost" data-pcgo="' + c.id + '">Painel</button><button type="button" class="btn ghost" data-client="' + c.id + '">Editar</button></div><dl>' +
+          (c.services ? "<dt>Serviços</dt><dd>" + esc(c.services) + "</dd>" : "") +
+          (c.rhythm ? "<dt>Ritmo</dt><dd>" + esc(c.rhythm) + "</dd>" : "") +
+          (c.team ? "<dt>Equipe</dt><dd>" + esc(c.team) + "</dd>" : "") +
+          "<dt>Este mês</dt><dd>" + n + " conteúdo" + (n === 1 ? "" : "s") + " · " + tr + " demanda" + (tr === 1 ? "" : "s") + " de tráfego</dd></dl></section>";
+      }).join("") : '<p class="empty">Nenhum cliente cadastrado ainda.</p>') + "</div>";
+  }
+
+  function vTrafego() {
+    const list = S.traffic.filter((x) => S.filter === "all" || x.clientId === S.filter);
+    const groups = S.clients.filter((c) => S.filter === "all" || c.id === S.filter).map((c) => {
+      const items = list.filter((x) => x.clientId === c.id).sort((a, b) => (a.status === "feito") - (b.status === "feito") || byDate({ date: a.due }, { date: b.due }));
+      if (!items.length && S.filter === "all") return "";
+      return '<section class="panel" style="--c:' + esc(c.color) + '"><div class="ph"><h2><span class="dot" style="display:inline-block;margin-right:8px"></span>' + esc(c.name) + '</h2><span class="k">' + items.filter((x) => x.status !== "feito").length + ' em aberto</span></div><ul class="list">' +
+        (items.length ? items.map((x) => '<li><button type="button" class="row" data-traffic="' + x.id + '"><span class="pill">' + esc(x.kind || "") + '</span><span class="t">' + esc(x.title) +
+          '<div class="s">' + [x.store, x.due ? "prazo " + dShort(x.due) : "", x.budget ? "verba " + brl(x.budget) : "", (x.updates || "").split("\n").filter(Boolean).slice(-1)[0]].filter(Boolean).map(esc).join(" · ") + "</div></span>" + trStatusPill(x.status) + "</button></li>").join("") : '<li class="empty">Nenhuma demanda.</li>') +
+        "</ul></section>";
+    }).join("");
+    return '<div class="head"><div><div class="crumb">Operação / Tráfego pago</div><h1>Tráfego <em>pago</em></h1><p class="lede">Demandas, campanhas e o que acompanhar em cada cliente.</p></div>' +
+      '<div class="toolbar"><button type="button" class="btn primary" data-new="traffic">Nova demanda</button></div></div>' + filterBar() +
+      (groups || '<p class="empty">Nenhuma demanda de tráfego registrada.</p>') +
+      '<p class="note">Para atualizar os números, peça ao Claude: “atualiza o tráfego da Moto e Cia”. Ele puxa os dados das contas de anúncio pelo Supermetrics e registra aqui nas atualizações.</p>';
+  }
+
+  function vFinanceiro() {
+    if (!S.owner) return '<h1>Financeiro</h1><p class="lede">Esta área é só da dona da central.</p>';
+    const m = S.finMonth;
+    const items = S.fin.filter((e) => monthOf(e.date) === m).sort(byDate);
+    const sum = (f) => items.filter(f).reduce((s, e) => s + (Number(e.amount) || 0), 0);
+    const inP = sum((e) => e.kind === "receber" && e.status !== "pago"), inR = sum((e) => e.kind === "receber" && e.status === "pago");
+    const outP = sum((e) => e.kind !== "receber" && e.status !== "pago"), outR = sum((e) => e.kind !== "receber" && e.status === "pago");
+    const missing = S.finrec.filter((r) => !S.fin.some((e) => e.id === r.id + "_" + m)).length;
+    return '<div class="head"><div><div class="crumb">Operação / Financeiro · só você</div><h1>Financeiro</h1><p class="lede">Recebimentos, pagamentos a parceiros, notas fiscais, gastos e investimentos.</p></div>' +
+      '<div class="toolbar"><button type="button" class="btn" data-fin="-1" aria-label="Mês anterior">←</button><h2 style="text-transform:capitalize">' + esc(monthLabel(m)) + '</h2><button type="button" class="btn" data-fin="1" aria-label="Próximo mês">→</button><button type="button" class="btn primary" data-new="fin">Novo lançamento</button></div></div>' +
+      '<div class="grid">' +
+      '<section class="panel c4"><div class="k">A receber</div><div class="big in">' + brl(inP) + '</div><div class="muted">Já recebido: ' + brl(inR) + "</div></section>" +
+      '<section class="panel c4"><div class="k">A pagar e gastos</div><div class="big out">' + brl(outP) + '</div><div class="muted">Já pago: ' + brl(outR) + "</div></section>" +
+      '<section class="panel dark c4"><div class="k">Saldo previsto do mês</div><div class="big">' + brl(inP + inR - outP - outR) + '</div><div class="muted">Entradas menos saídas</div></section></div>' +
+      (missing ? '<div class="toolbar"><span class="muted">' + missing + " lançamento" + (missing > 1 ? "s" : "") + " recorrente" + (missing > 1 ? "s" : "") + " ainda não gerado" + (missing > 1 ? "s" : "") + ' neste mês.</span><button type="button" class="btn" data-genrec="1">Gerar recorrentes</button></div>' : "") +
+      '<section class="panel"><div class="table-wrap"><table><thead><tr><th>Venc.</th><th>Descrição</th><th>Tipo</th><th>Cliente / parceiro</th><th>NF</th><th class="num">Valor</th><th>Situação</th></tr></thead><tbody>' +
+      (items.length ? items.map((e) => '<tr class="click" data-finrow="' + e.id + '"><td>' + dShort(e.date) + "</td><td>" + esc(e.desc) + "</td><td>" + esc(FKN[e.kind] || e.kind) + "</td><td>" + esc(e.partner || (e.clientId ? cname(e.clientId) : "")) + "</td><td>" + (e.kind === "receber" ? (e.nf ? '<span class="pill ok">emitida</span>' : '<span class="pill warn">emitir</span>') : "") + '</td><td class="num ' + (e.kind === "receber" ? "in" : "out") + '">' + (e.kind === "receber" ? "+ " : "− ") + brl(e.amount) + '</td><td><button type="button" class="pill ' + (e.status === "pago" ? "ok" : "warn") + '" data-paytoggle="' + e.id + '" style="border:0">' + (e.status === "pago" ? (e.kind === "receber" ? "recebido" : "pago") : "pendente") + "</button></td></tr>").join("") : '<tr><td colspan="7" class="empty">Nenhum lançamento neste mês.</td></tr>') +
+      "</tbody></table></div></section>" +
+      '<section class="panel"><div class="ph"><h2>Recorrentes</h2><button type="button" class="btn ghost" data-new="rec">Novo recorrente</button></div><ul class="list">' +
+      (S.finrec.length ? S.finrec.map((r) => '<li><button type="button" class="row" data-rec="' + r.id + '"><span class="pill">dia ' + esc(r.day) + '</span><span class="t">' + esc(r.desc) + '<div class="s">' + esc(FKN[r.kind] || "") + "</div></span><span>" + brl(r.amount) + "</span></button></li>").join("") : '<li class="empty">Nenhum recorrente.</li>') +
+      '</ul></section><p class="note">Só você vê esta área. Mesmo que você compartilhe a central com a equipe, os dados do financeiro ficam bloqueados para qualquer outra pessoa.</p>';
+  }
+
+  // ---------- render ----------
+  function render() {
+    for (const b of document.querySelectorAll("#menu button")) b.setAttribute("aria-current", b.dataset.view === S.view ? "page" : "false");
+    $("#nav-fin").hidden = !S.owner;
+    $("#b-aprovacao").textContent = S.posts.filter((p) => p.status === "aprovacao").length || "";
+    $("#b-conteudo").textContent = S.posts.filter((p) => monthOf(p.date) === thisMonth()).length || "";
+    $("#b-trafego").textContent = S.traffic.filter((x) => x.status !== "feito").length || "";
+    if (!db) return;
+    $("#nav-matriz").hidden = !S.owner;
+    $("#b-equipe").textContent = TEAM.filter((t) => t.name !== "Luiza").reduce((s, t) => s + teamCount(t), 0) || "";
+    $("#b-medico").textContent = S.medicos.filter((x) => x.status !== "pausado").length || "";
+    $("#b-demandas").textContent = S.demandas.filter((d) => d.status !== "feito").length || "";
+    const v = { geral: vGeral, matriz: vMatriz, equipe: vEquipe, demandas: vDemandas, conteudo: vConteudo, aprovacao: vAprovacao, painel: vPainel, medico: vMedico, clientes: vClientes, trafego: vTrafego, financeiro: vFinanceiro }[S.view] || vGeral;
+    const scroller = $(".kanban-wrap"); const sx = scroller ? scroller.scrollLeft : 0;
+    $("#main").innerHTML = (S.err ? '<div class="status err" role="alert">' + esc(S.err) + "</div>" : "") +
+      (!S.ready ? '<div class="status">Carregando seus dados…</div>' : "") + v();
+    const ns = $(".kanban-wrap"); if (ns) ns.scrollLeft = sx;
+  }
+
+  function go(view) { S.view = view; S.err = ""; try { localStorage.setItem("nexo-view", view); } catch (e) {} render(); window.scrollTo(0, 0); }
+
+  document.addEventListener("click", async (ev) => {
+    const el = ev.target.closest("[data-demwho],[data-newdemc],[data-person],[data-dem],[data-mxedit],[data-mxdeleg],[data-mxdel],[data-medtab],[data-medrole],[data-medstatus],[data-med],[data-editmed],[data-medm],[data-medclient],[data-pcgo],[data-pc],[data-editbrand],[data-rmimg],[data-copy],[data-view],[data-go],[data-new],[data-post],[data-client],[data-traffic],[data-filter],[data-mode],[data-cal],[data-fin],[data-finrow],[data-paytoggle],[data-rec],[data-genrec],[data-newdate]");
+    if (!el || el.closest("dialog")) return;
+    const d = el.dataset;
+    if (d.demwho) { S.demWho = d.demwho; return render(); }
+    if (d.newdemc) return editDemanda(null, { clientId: d.newdemc });
+    if (d.person) { S.person = d.person; try { localStorage.setItem("nexo-person", d.person); } catch (e) {} return render(); }
+    if (d.dem) return editDemanda(S.demandas.find((x) => x.id === d.dem));
+    if (d.new === "dem") return editDemanda();
+    if (d.mxedit) return editTask(S.matriz.find((x) => x.id === d.mxedit));
+    if (d.mxdeleg) return delegate(S.matriz.find((x) => x.id === d.mxdeleg));
+    if (d.mxdel) {
+      if (S.mxDel !== d.mxdel) { S.mxDel = d.mxdel; render(); setTimeout(() => { if (S.mxDel === d.mxdel) { S.mxDel = null; render(); } }, 3000); return; }
+      S.mxDel = null; return del("matriz", d.mxdel);
+    }
+    if (d.medtab) { S.medTab = d.medtab; try { localStorage.setItem("nexo-medtab", d.medtab); } catch (e) {} return render(); }
+    if (d.medrole) { S.medRole = d.medrole; return render(); }
+    if (d.medstatus) { const m = S.medicos.find((x) => x.id === S.med); if (m) patch("medicos", m.id, Object.assign({ status: d.medstatus }, d.medstatus === "implantacao" && !m.start ? { start: today() } : {})); return; }
+    if (d.med !== undefined) { S.med = d.med || null; render(); window.scrollTo(0, 0); return; }
+    if (d.editmed) return editMed(S.medicos.find((x) => x.id === d.editmed));
+    if (d.new === "med") return editMed();
+    if (d.medm) { S.medMonth = addMonth(S.medMonth, Number(d.medm)); return render(); }
+    if (d.pcgo) { S.pc = d.pcgo; return go("painel"); }
+    if (d.medclient) {
+      const m = S.medicos.find((x) => x.id === d.medclient);
+      if (await save("clients", m.id, { name: m.name, niche: "Marketing médico" + (m.specialty ? " · " + m.specialty : ""), color: "#00a896", services: "Método iMed · " + (m.package || ""), rhythm: "", team: m.contact || "", instagram: m.instagram || "", notes: m.notes || "", order: 50 })) { S.pc = m.id; go("painel"); }
+      return;
+    }
+    if (d.pc) { S.pc = d.pc; S.rmPending = null; return render(); }
+    if (d.editbrand) return editBrand(d.editbrand);
+    if (d.copy) { try { await navigator.clipboard.writeText(d.copy); el.lastChild.textContent = "copiado"; setTimeout(render, 1200); } catch (e) {} return; }
+    if (d.rmimg) {
+      const cid = S.pc && client(S.pc) ? S.pc : (S.filter !== "all" ? S.filter : (S.clients[0] || {}).id);
+      if (S.rmPending !== d.rmimg) { S.rmPending = d.rmimg; render(); setTimeout(() => { if (S.rmPending === d.rmimg) { S.rmPending = null; render(); } }, 3000); return; }
+      S.rmPending = null; const [field, idx] = d.rmimg.split(":"); return removeFile(cid, field, Number(idx));
+    }
+    if (d.view) return go(d.view);
+    if (d.go) return go(d.go);
+    if (d.newdate) return editPost(null, { date: d.newdate });
+    if (d.new === "post") return editPost();
+    if (d.new === "client") return editClient();
+    if (d.new === "traffic") return editTraffic();
+    if (d.new === "fin") return editFin();
+    if (d.new === "rec") return editRec();
+    if (d.post) return editPost(S.posts.find((p) => p.id === d.post));
+    if (d.client) return editClient(client(d.client));
+    if (d.traffic) return editTraffic(S.traffic.find((x) => x.id === d.traffic));
+    if (d.filter) { S.filter = d.filter; return render(); }
+    if (d.mode) { S.mode = d.mode; try { localStorage.setItem("nexo-mode", d.mode); } catch (e) {} return render(); }
+    if (d.cal) { S.calMonth = addMonth(S.calMonth, Number(d.cal)); return render(); }
+    if (d.fin) { S.finMonth = addMonth(S.finMonth, Number(d.fin)); return render(); }
+    if (d.paytoggle) { ev.stopPropagation(); const e = S.fin.find((x) => x.id === d.paytoggle); return patch("fin", e.id, { status: e.status === "pago" ? "pendente" : "pago" }); }
+    if (d.finrow) return editFin(S.fin.find((x) => x.id === d.finrow));
+    if (d.rec) return editRec(S.finrec.find((x) => x.id === d.rec));
+    if (d.genrec) {
+      const m = S.finMonth; const [y, mo] = m.split("-").map(Number); const last = new Date(y, mo, 0).getDate();
+      for (const r of S.finrec) {
+        const id = r.id + "_" + m;
+        if (S.fin.some((e) => e.id === id)) continue;
+        await save("fin", id, { desc: r.desc, kind: r.kind, amount: r.amount, clientId: r.clientId || "", partner: r.partner || "", date: m + "-" + pad(Math.min(Number(r.day) || 1, last)), status: "pendente", nf: false, recId: r.id });
+      }
+    }
+  });
+
+  document.addEventListener("change", (ev) => {
+    const ck = ev.target.closest && ev.target.closest("input[data-mck]");
+    const pr = ev.target.closest && ev.target.closest("select[data-prio]");
+    const t = ev.target;
+    if (t.dataset && t.dataset.mxdone) { patch("matriz", t.dataset.mxdone, t.checked ? { done: true, doneAt: new Date().toISOString() } : { done: false, doneAt: null }); return; }
+    if (t.dataset && t.dataset.mxq) { patch("matriz", t.dataset.mxq, { q: Number(t.value) }); return; }
+    if (t.dataset && t.dataset.demdone) { patch("demandas", t.dataset.demdone, t.checked ? { status: "feito", doneAt: new Date().toISOString() } : { status: "afazer", doneAt: null }); return; }
+    if (t.dataset && t.dataset.demst) { patch("demandas", t.dataset.demst, Object.assign({ status: t.value }, t.value === "feito" ? { doneAt: new Date().toISOString() } : {})); return; }
+    const gv = ev.target.closest && ev.target.closest("select[data-grav]");
+    if (gv) { patch("medicos", gv.dataset.grav, { gravacao: gv.value }); return; }
+    const m = S.medicos.find((x) => x.id === ((ck && ck.dataset.mid) || S.med));
+    if (m && ck) { const checks = Object.assign({}, m.checks || {}); if (ck.checked) checks[ck.dataset.mck] = true; else delete checks[ck.dataset.mck]; patch("medicos", m.id, { checks }); return; }
+    if (m && pr) { patch("medicos", m.id, { prio: Object.assign({}, m.prio || {}, { [pr.dataset.prio]: pr.value }) }); return; }
+    const inp = ev.target.closest && ev.target.closest("input[data-upload]");
+    if (!inp || !inp.files || !inp.files.length) return;
+    const cid = S.pc && client(S.pc) ? S.pc : (S.filter !== "all" ? S.filter : (S.clients[0] || {}).id);
+    uploadFiles(cid, inp.dataset.upload, Array.from(inp.files));
+  });
+
+  document.addEventListener("submit", async (ev) => {
+    if (ev.target.id !== "mx-add") return;
+    ev.preventDefault();
+    const title = $("#mx-title").value.trim(); if (!title) return;
+    const data = { title, q: Number($("#mx-q").value), done: false, created: new Date().toISOString() };
+    if ($("#mx-due").value) data.due = $("#mx-due").value;
+    if (await save("matriz", uid("m"), data)) { $("#mx-title").value = ""; $("#mx-due").value = ""; }
+  });
+
+  // arrastar cartões entre etapas
+  document.addEventListener("dragstart", (ev) => { const c = ev.target.closest && ev.target.closest(".card"); if (c) ev.dataTransfer.setData("text/plain", c.dataset.post ? "post:" + c.dataset.post : "dem:" + c.dataset.dem); });
+  document.addEventListener("dragover", (ev) => { const col = ev.target.closest && ev.target.closest(".col"); if (col) { ev.preventDefault(); col.classList.add("over"); } });
+  document.addEventListener("dragleave", (ev) => { const col = ev.target.closest && ev.target.closest(".col"); if (col && !col.contains(ev.relatedTarget)) col.classList.remove("over"); });
+  document.addEventListener("drop", (ev) => {
+    const col = ev.target.closest && ev.target.closest(".col"); if (!col) return;
+    ev.preventDefault(); col.classList.remove("over");
+    const [kind, id] = ev.dataTransfer.getData("text/plain").split(":");
+    if (kind === "post") { const p = S.posts.find((x) => x.id === id); if (p && col.dataset.col && p.status !== col.dataset.col) patch("posts", id, { status: col.dataset.col }); }
+    if (kind === "dem") { const d = S.demandas.find((x) => x.id === id); const st = col.dataset.dcol; if (d && st && d.status !== st) patch("demandas", id, Object.assign({ status: st }, st === "feito" ? { doneAt: new Date().toISOString() } : {})); }
+  });
+
+  // ---------- boot ----------
+  S.calMonth = thisMonth(); S.finMonth = thisMonth(); S.medMonth = thisMonth();
+  try {
+    const hv = (location.hash || "").slice(1);
+    S.person = localStorage.getItem("nexo-person") || null;
+    S.view = ["geral", "matriz", "equipe", "demandas", "conteudo", "aprovacao", "painel", "medico", "clientes", "trafego", "financeiro"].includes(hv) ? hv : (localStorage.getItem("nexo-view") || "geral");
+    S.mode = localStorage.getItem("nexo-mode") || "quadro";
+    S.medTab = localStorage.getItem("nexo-medtab") || "implantacao";
+  } catch (e) {}
+  render();
+  (async () => {
+    db = window.claude && window.claude.use ? await window.claude.use("db") : null;
+    if (!db) { $("#main").innerHTML = '<h1>Nexo Digital</h1><p class="lede">Entre na sua conta do Claude para abrir a central.</p>'; return; }
+    const user = await window.claude.use("user");
+    try { S.owner = user ? !!(await user.isOwner()) : false; } catch (e) { S.owner = false; }
+    if ((S.view === "financeiro" || S.view === "matriz") && !S.owner) S.view = "geral";
+    render();
+    listen("clients", "clients", (a, b) => (a.order || 99) - (b.order || 99) || (a.name < b.name ? -1 : 1));
+    listen("posts", "posts", byDate);
+    listen("traffic", "traffic");
+    listen("demandas", "demandas");
+    if (S.owner) listen("matriz", "matriz");
+    listen("medicos", "medicos", (a, b) => (a.name || "") < (b.name || "") ? -1 : 1);
+    listenMap("brand", "brand");
+    listenMap("metrics", "metrics");
+    try { assets = await window.claude.use("assets"); } catch (e) { assets = null; }
+    render();
+    if (S.owner) { listen("fin", "fin", byDate); listen("finrec", "finrec", (a, b) => (Number(a.day) || 0) - (Number(b.day) || 0)); }
+  })();
+})();
+</script>
